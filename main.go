@@ -23,21 +23,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	srvErrs := make(chan error, 1)
+	srvErrsCh := make(chan error, 1)
 
 	go func() {
-		srvErrs <- s.Start()
+		srvErrsCh <- s.Start()
 	}()
 
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+	shutdownCh := make(chan os.Signal, 1)
+	signal.Notify(shutdownCh, os.Interrupt, syscall.SIGTERM)
 
 	select {
-	case err := <-srvErrs:
+	case err := <-srvErrsCh:
 		if !errors.Is(err, http.ErrServerClosed) {
 			s.Logger.Error("server error", "error", err)
 		}
-	case <-shutdown:
+	case <-shutdownCh:
 		ctx, cancel := context.WithTimeout(context.Background(), common.Timeouts.Server.Write)
 		defer cancel()
 
