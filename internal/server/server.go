@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/ashtishad/xpay/internal/common"
 	"github.com/ashtishad/xpay/internal/infra/postgres"
@@ -19,7 +20,6 @@ type Server struct {
 	httpServer *http.Server
 	DB         *sql.DB
 	Config     *common.AppConfig
-	Logger     *slog.Logger
 }
 
 func NewServer(ctx context.Context) (*Server, error) {
@@ -28,25 +28,24 @@ func NewServer(ctx context.Context) (*Server, error) {
 		return nil, err
 	}
 
+	var logLevel = new(slog.LevelVar) // Info by default
+	h := slog.NewJSONHandler(os.Stderr, common.GetJSONHandlerOptions(logLevel))
+	slog.SetDefault(slog.New(h))
+
 	gin.SetMode(cfg.App.GinMode)
 	router := gin.New()
 
-	logLevel := slog.LevelInfo
-
 	if gin.IsDebugging() {
-		logLevel = slog.LevelDebug
+		logLevel.Set(slog.LevelDebug)
 	}
 
-	logger := common.NewSlogger(logLevel)
-	slog.SetDefault(logger)
-
-	db, err := postgres.NewConnection(ctx, cfg.DB, logger)
+	db, err := postgres.NewConnection(ctx, cfg.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := postgres.RunMigrations(ctx, db, logger); err != nil {
-		logger.Warn("failed to run migrations", "err", err)
+	if err := postgres.RunMigrations(ctx, db); err != nil {
+		slog.Warn("failed to run migrations", "err", err)
 		return nil, err
 	}
 
@@ -54,7 +53,6 @@ func NewServer(ctx context.Context) (*Server, error) {
 
 	s := &Server{
 		Router: router,
-		Logger: logger,
 		DB:     db,
 		Config: cfg,
 		httpServer: &http.Server{
@@ -70,18 +68,18 @@ func NewServer(ctx context.Context) (*Server, error) {
 
 	s.setupRoutes()
 
-	s.Logger.Info(fmt.Sprintf("Swagger Specs available at %s/swagger/index.html", s.httpServer.Addr))
+	slog.Info(fmt.Sprintf("Swagger Specs available at %s/swagger/index.html", s.httpServer.Addr))
 
 	return s, nil
 }
 
 func (s *Server) setupMiddlewares() {
-	s.Router.Use(middlewares.InitMiddlewares(s.Logger)...)
+	s.Router.Use(middlewares.InitMiddlewares()...)
 }
 
 func (s *Server) setupRoutes() {
 	apiGroup := s.Router.Group("/api/v1")
-	routes.InitRoutes(apiGroup, s.Logger, s.DB, s.Config)
+	routes.InitRoutes(apiGroup, s.DB, s.Config)
 }
 
 func (s *Server) Start() error {
@@ -90,7 +88,7 @@ func (s *Server) Start() error {
 
 func (s *Server) Shutdown(ctx context.Context) error {
 	if err := s.DB.Close(); err != nil {
-		s.Logger.Error("failed to close database connection", "error", err)
+		slog.Error("failed to close database connection", "error", err)
 	}
 
 	if err := s.httpServer.Shutdown(ctx); err != nil {

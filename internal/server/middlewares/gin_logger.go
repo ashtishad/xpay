@@ -10,7 +10,7 @@ import (
 // CustomLogger creates a middleware for logging HTTP requests.
 // It captures request details, timing, and response status for each request.
 // Logs are formatted using structured logging via slog.
-func CustomLogger(logger *slog.Logger) gin.HandlerFunc {
+func CustomLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 		path := c.Request.URL.Path
@@ -28,7 +28,7 @@ func CustomLogger(logger *slog.Logger) gin.HandlerFunc {
 			path = path + "?" + raw
 		}
 
-		logger.Info("HTTP Request",
+		slog.Info("HTTP Request",
 			slog.String("method", method),
 			slog.String("path", path),
 			slog.Int("status", statusCode),
