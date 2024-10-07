@@ -33,3 +33,54 @@ Refer to **Makefile** for more details on development commands. Example: `make m
 - [swaggo/swag](https://github.com/swaggo/swag): Swagger API documentation.
 - [Air](https://github.com/cosmtrek/air): Live reloading. (config: .air.toml)
 - [golangci-lint](https://golangci-lint.run/): Linting (config: .golangci.yaml)
+
+
+## API Documentation
+
+### Authentication Endpoints
+
+#### Register User
+- **URL**: `/api/v1/register`
+- **Method**: `POST`
+- **Description**: Registers a new user with hashed password, generates JWT tokens, sets an HTTP-only cookie and X-Request-Id header.
+- **Request Body**:
+  ```json
+  {
+    "fullName": "John Doe",
+    "email": "someone@example.com",
+    "password": "samplepass"
+  }
+  ```
+- **Success Response**: `201 Created`
+  ```json
+  {
+    "user": {
+      "uuid": "92e275af-4803-4929-968c-3feb25e038d3",
+      "fullName": "John Doe",
+      "email": "someone@example.com",
+      "status": "active",
+      "role": "user",
+      "createdAt": "2024-10-07T06:18:54.980941Z",
+      "updatedAt": "2024-10-07T06:18:54.980941Z"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400 Bad Request`:
+    ```json
+    {
+      "error": "FullName must be at least 3 characters. Email must be a valid email. Password must be at least 8 characters"
+    }
+    ```
+  - `409 Conflict`:
+    ```json
+    {
+      "error": "user with this email already exists"
+    }
+    ```
+  - `500 Internal Server Error`:
+    ```json
+    {
+      "error": "An unexpected error occurred"
+    }
+    ```
