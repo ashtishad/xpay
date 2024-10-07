@@ -16,7 +16,6 @@ tmp/
 .idea
 
 # misc
-.air.toml
 .DS_Store
 config.yaml
 config.local.yaml
