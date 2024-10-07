@@ -1,0 +1,18 @@
+#!/bin/sh
+
+echo "Running tests..."
+make test
+if [ $? -ne 0 ]; then
+    echo "Tests failed. Push aborted."
+    exit 1
+fi
+
+echo "Running linter..."
+make lint
+if [ $? -ne 0 ]; then
+    echo "Linter failed. Push aborted."
+    exit 1
+fi
+
+echo "All checks passed. Proceeding with push."
+exit 0

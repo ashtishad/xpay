@@ -18,6 +18,12 @@ lint:
 	@which golangci-lint > /dev/null 2>&1 || go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	@golangci-lint run ./...
 
+# Setup Git hooks
+setup-hooks:
+	@cp scripts/pre-push .git/hooks/
+	@chmod +x .git/hooks/pre-push
+	@echo "Git hooks set up successfully"
+
 # Docker compose commands
 up:
 	@docker compose up -d
@@ -60,4 +66,4 @@ docker-stop:
 docker-rerun: docker-stop docker-build docker-run
 
 .PHONY: run watch test lint up down down-data docker-build docker-run docker-stop docker-rerun \
-        migrate-up migrate-down migrate-create check_and_install_migrate
+        migrate-up migrate-down migrate-create check_and_install_migrate setup-hooks
