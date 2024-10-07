@@ -1,0 +1,66 @@
+name: Run unit tests
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - '**.go'
+      - '**.sql'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/**.yaml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - '**.go'
+      - '**.sql'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/**.yaml'
+
+env:
+  GO_VERSION: '1.23.2'
+  GOLANGCI_LINT_VERSION: v1.61
+
+jobs:
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17.0-alpine3.20
+        env:
+          POSTGRES_DB: xpay
+          POSTGRES_USER: ash
+          POSTGRES_PASSWORD: samplepass
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Update Go modules
+      run: go mod tidy
+
+    - name: Run migrations
+      run: make migrate-up
+
+    - name: Run Tests
+      run: make test
+
+    - name: Golangci-lint
+      uses: golangci/golangci-lint-action@v6
+      with:
+        version: ${{ env.GOLANGCI_LINT_VERSION }}

@@ -1,0 +1,21 @@
+app:
+  env: dev  # Options: dev, staging, production
+  gin_mode: release # Options: debug, release.
+  server_address: ":8080"
+
+db:
+  # Use environment variables for credentials in non-local environments
+  url: "postgres://ash:samplepass@127.0.0.1:5432/xpay?sslmode=disable&timezone=UTC"
+  max_open_conns: 18
+  max_idle_conns: 18
+  conn_max_lifetime: "1h"
+  conn_max_idle_time: "30m"
+
+jwt:
+  # Example keys. Use secure, unique keys per environment
+  private_key: "LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSU9iOGZ2a0Z5L3ZLaVRIZkNvRDlnbENTUzdZeDdSVmhPMVN4UGE2MGRPOEZvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFcmJZQVczV0FtZlpENUVnVXQ2T1NNSUxudWxHQmpRaUNXZUY5S0Z2czJnS29XQTEveW1vNwpnS2o3S2JCd0FYNDRGTVFVOGkxQTRqcTN3RmJFeEdkWWxRPT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo="
+  public_key: "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFcmJZQVczV0FtZlpENUVnVXQ2T1NNSUxudWxHQgpqUWlDV2VGOUtGdnMyZ0tvV0ExL3ltbzdnS2o3S2JCd0FYNDRGTVFVOGkxQTRqcTN3RmJFeEdkWWxRPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
+
+card:
+  # Example key. Use a secure, unique key per environment
+  aes_key: "CWcKy/Jl/FOwCevQfkWDSGU5QZt0WMZCh/kC68k1LmM="
