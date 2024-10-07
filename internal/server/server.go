@@ -10,6 +10,7 @@ import (
 
 	"github.com/ashtishad/xpay/internal/common"
 	"github.com/ashtishad/xpay/internal/infra/postgres"
+	"github.com/ashtishad/xpay/internal/secure"
 	"github.com/ashtishad/xpay/internal/server/middlewares"
 	"github.com/ashtishad/xpay/internal/server/routes"
 	"github.com/gin-gonic/gin"
@@ -49,6 +50,11 @@ func NewServer(ctx context.Context) (*Server, error) {
 		return nil, err
 	}
 
+	jwtManager, err := secure.NewJWTManager(&cfg.JWT)
+	if err != nil {
+		return nil, err
+	}
+
 	_ = router.SetTrustedProxies(nil)
 
 	s := &Server{
@@ -66,7 +72,7 @@ func NewServer(ctx context.Context) (*Server, error) {
 
 	s.setupMiddlewares()
 
-	s.setupRoutes()
+	s.setupRoutes(jwtManager)
 
 	slog.Info(fmt.Sprintf("Swagger Specs available at %s/swagger/index.html", s.httpServer.Addr))
 
@@ -77,9 +83,9 @@ func (s *Server) setupMiddlewares() {
 	s.Router.Use(middlewares.InitMiddlewares()...)
 }
 
-func (s *Server) setupRoutes() {
+func (s *Server) setupRoutes(jm *secure.JWTManager) {
 	apiGroup := s.Router.Group("/api/v1")
-	routes.InitRoutes(apiGroup, s.DB, s.Config)
+	routes.InitRoutes(apiGroup, s.DB, s.Config, jm)
 }
 
 func (s *Server) Start() error {
