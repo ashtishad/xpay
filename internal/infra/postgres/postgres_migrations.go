@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log/slog"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -12,7 +11,7 @@ import (
 )
 
 // RunMigrations executes database migrations using the golang-migrate/v4 library.
-func RunMigrations(ctx context.Context, db *sql.DB, l *slog.Logger) error {
+func RunMigrations(ctx context.Context, db *sql.DB) error {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to create database driver: %w", err)
