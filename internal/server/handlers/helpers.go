@@ -9,6 +9,7 @@ import (
 )
 
 // formatValidationError formats validation errors into a single string
+// nolint: unused
 func formatValidationError(err error) string {
 	var validationErrors validator.ValidationErrors
 	if !errors.As(err, &validationErrors) {
