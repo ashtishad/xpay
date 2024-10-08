@@ -12,9 +12,9 @@ import (
 )
 
 type JWTManager struct {
-	PublicKey        *ecdsa.PublicKey
 	AccessExpiration time.Duration
 
+	publicKey  *ecdsa.PublicKey
 	privateKey *ecdsa.PrivateKey
 }
 
@@ -31,7 +31,7 @@ func NewJWTManager(config *common.JWTConfig) (*JWTManager, error) {
 
 	return &JWTManager{
 		privateKey:       privateKey,
-		PublicKey:        publicKey,
+		publicKey:        publicKey,
 		AccessExpiration: config.AccessExpiration,
 	}, nil
 }
@@ -39,6 +39,11 @@ func NewJWTManager(config *common.JWTConfig) (*JWTManager, error) {
 type JWTClaims struct {
 	UserUUID string
 	jwt.RegisteredClaims
+}
+
+// GetPublicKey returns the public key used for token verification
+func (jm *JWTManager) GetPublicKey() *ecdsa.PublicKey {
+	return jm.publicKey
 }
 
 // GenerateAccessToken returns signed jwt token string
@@ -64,4 +69,30 @@ func (jm *JWTManager) GenerateAccessToken(userUUID string) (string, error) {
 	}
 
 	return signedString, nil
+}
+
+func ValidateToken(tokenString string, jwtPublicKey *ecdsa.PublicKey) (*JWTClaims, error) {
+	if tokenString == "" {
+		return nil, errors.New("token string cannot be empty")
+	}
+
+	keyFunc := func(token *jwt.Token) (any, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodECDSA); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
+
+		return jwtPublicKey, nil
+	}
+
+	token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, keyFunc)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(*JWTClaims); ok && token.Valid {
+		return claims, nil
+	}
+
+	return nil, errors.New("invalid token")
 }
