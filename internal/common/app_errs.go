@@ -89,13 +89,18 @@ func NewBadRequestError(message string) AppError {
 // Example:
 //
 //	err := NewInternalServerError("Failed to query database", dbErr)
-//	logger.Error(err.DetailedError()) // Log the detailed error
+//	slog.Error(err.DetailedError()) // Log the detailed error
 func NewInternalServerError(message string, err error) AppError {
-	return &appErr{
-		userMessage: "An unexpected error occurred",
+	appErr := &appErr{
+		userMessage: message,
 		statusCode:  http.StatusInternalServerError,
-		internalErr: fmt.Errorf("%s: %w", message, err),
 	}
+
+	if err != nil {
+		appErr.internalErr = fmt.Errorf("%s: %w", message, err)
+	}
+
+	return appErr
 }
 
 // NewNotFoundError creates a new AppError for not found errors.
@@ -132,4 +137,13 @@ func NewConflictError(message string) AppError {
 //	err := NewRateLimitError("too many requests")
 func NewRateLimitError(message string) AppError {
 	return newAppError(http.StatusTooManyRequests, message)
+}
+
+// NewForbiddenError creates a new AppError for forbidden access errors.
+//
+// Example:
+//
+//	err := NewForbiddenError("Access denied")
+func NewForbiddenError(message string) AppError {
+	return newAppError(http.StatusForbidden, message)
 }
