@@ -25,7 +25,7 @@ Refer to **Makefile** for more details on development commands. Example: `make m
 #### Used in the Core API
 - [Gin](https://github.com/gin-gonic/gin): HTTP routing and middleware.
 - [pgx](https://github.com/jackc/pgx): Database driver and connection pooling, using standard *sql.DB handle.
-- [golang-jwt](https://github.com/golang-jwt/jwt): JSON Web Token handling.
+- [golang-jwt](https://github.com/golang-jwt/jwt/): JSON Web Token handling.
 - [golang-migrate](https://github.com/golang-migrate/migrate): Database migrations.
 - [viper](https://github.com/spf13/viper): For configuration management. (config: config.yaml)
 
@@ -34,6 +34,85 @@ Refer to **Makefile** for more details on development commands. Example: `make m
 - [Air](https://github.com/cosmtrek/air): Live reloading. (config: .air.toml)
 - [golangci-lint](https://golangci-lint.run/): Linting (config: .golangci.yaml)
 
+
+## Project Structure (Domain Driven Design, Loosely Coupled, Clean Architecture)
+
+command
+`tree -a -I '.git|.DS_Store|.gitignore|.idea|docs|api-collections'`
+
+```
+├── .github
+│   └── workflows
+│       └── test.yaml                 # CI/CD pipeline for running tests
+├── internal
+│   ├── common
+│   │   ├── app_errs.go               # Custom error types
+│   │   ├── config.go                 # Configuration management
+│   │   ├── constants.go              # Global constants
+│   │   ├── context_keys.go           # Context key definitions
+│   │   ├── custom_err_messages.go    # Error message definitions
+│   │   ├── slog_config.go            # Structured logging configuration
+│   │   └── timeouts.go               # Timeout constants
+│   ├── domain
+│   │   ├── helpers.go                # Domain-specific helper functions
+│   │   ├── user.go                   # User domain model
+│   │   ├── user_repository.go        # User repository interface
+│   │   ├── wallet.go                 # Wallet domain model
+│   │   └── wallet_repository.go      # Wallet repository interface
+│   ├── dto
+│   │   ├── auth.go                   # Authentication-related DTOs
+│   │   ├── common.go                 # Shared DTO structures
+│   │   └── wallet.go                 # Wallet-related DTOs
+│   ├── infra
+│   │   ├── docker
+│   │   │   └── init-db.sql           # Initial database setup script for docker compose
+│   │   ├── postgres
+│   │   │   ├── postgres_connection.go # Postgres connection setup with pgx, returns *sql.DB
+│   │   │   └── postgres_migrations.go # Database migration handling with golang-migrate/v4
+│   │   ├── kafka
+│   │   │   └── sample.md             # Placeholder for Kafka integration
+│   │   ├── nats
+│   │   │   └── sample.md             # Placeholder for NATS integration
+│   │   └── redis
+│   │       └── sample.md             # Placeholder for Redis integration
+│   ├── secure
+│   │   ├── jwt.go                    # JWT token handling, genrate and validate tokens
+│   │   ├── password.go               # Password hashing and verification with bcrypt
+│   │   └── password_test.go          # Password utility tests
+│   └── server
+│       ├── handlers
+│       │   ├── auth.go               # Login, Register handlers
+│       │   ├── helpers.go            # Handlers helper functions
+│       │   └── wallet.go             # Wallet HTTP handlers
+│       ├── middlewares
+│       │   ├── auth.go               # Auth middleware (Validate token, Set Authorized user in req context)
+│       │   ├── cors.go               # CORS middleware
+│       │   ├── gin_logger.go         # Custom Logging middleware for gin
+│       │   ├── middlewares.go        # Core Middleware setup
+│       │   └── request_id.go         # Request ID middleware, sets X-Request-ID header
+│       ├── routes
+│       │   ├── auth.go               # Authentication routes
+│       │   ├── routes.go             # Core routes setup
+│       │   └── wallet.go             # Wallet routes
+│       └── server.go                  # HTTP server setup with gin
+├── migrations
+│   ├── 000001_create_users_table.down.sql   # User table rollback
+│   ├── 000001_create_users_table.up.sql     # User table creation
+│   ├── 000002_create_wallets_table.down.sql # Wallet table rollback
+│   └── 000002_create_wallets_table.up.sql   # Wallet table creation
+├── scripts
+│   └── pre-push                      # Git pre-push hook (ensures run tests and lint before every push)
+├── local-dev
+│   └── config.yaml.example          # Example configuration file (place it to project root as `config.yaml`)
+├── config.yaml                       # Application configuration
+├── main.go                           # Application entry point
+├── Makefile                          # Development commands and shortcuts
+├── README.md                         # Project documentation
+├── compose.yaml                      # Docker Compose configuration
+├── go.mod                            # Go module definition
+├── go.sum                            # Go module checksums
+├── .air.toml                         # Live reload configuration with air
+```
 
 ## API Documentation
 
