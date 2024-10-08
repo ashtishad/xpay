@@ -16,7 +16,7 @@ func RequestID() gin.HandlerFunc {
 			requestID = uuid.New().String()
 		}
 
-		c.Set(common.RequestIDKey, requestID)
+		c.Set(common.ContextKeyRequestID, requestID)
 		c.Header(common.RequestIDHeader, requestID)
 		c.Next()
 	}
