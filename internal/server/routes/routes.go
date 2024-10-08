@@ -11,6 +11,8 @@ import (
 
 func InitRoutes(rg *gin.RouterGroup, db *sql.DB, config *common.AppConfig, jm *secure.JWTManager) {
 	userRepo := domain.NewUserRepository(db)
+	walletRepo := domain.NewWalletRepository(db)
 
 	registerAuthRoutes(rg, userRepo, jm)
+	registerWalletRoutes(rg, walletRepo, userRepo, jm.GetPublicKey())
 }
