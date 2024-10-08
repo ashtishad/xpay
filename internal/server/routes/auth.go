@@ -11,4 +11,5 @@ func registerAuthRoutes(rg *gin.RouterGroup, userRepo domain.UserRepository, jm 
 	authHandler := handlers.NewAuthHandler(userRepo, jm)
 
 	rg.POST("/register", authHandler.Register)
+	rg.POST("/login", authHandler.Login)
 }
