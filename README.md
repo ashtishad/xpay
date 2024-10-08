@@ -45,14 +45,6 @@ command
 │   └── workflows
 │       └── test.yaml                 # CI/CD pipeline for running tests
 ├── internal
-│   ├── common
-│   │   ├── app_errs.go               # Custom error types
-│   │   ├── config.go                 # Configuration management
-│   │   ├── constants.go              # Global constants
-│   │   ├── context_keys.go           # Context key definitions
-│   │   ├── custom_err_messages.go    # Error message definitions
-│   │   ├── slog_config.go            # Structured logging configuration
-│   │   └── timeouts.go               # Timeout constants
 │   ├── domain
 │   │   ├── helpers.go                # Domain-specific helper functions
 │   │   ├── user.go                   # User domain model
@@ -63,18 +55,6 @@ command
 │   │   ├── auth.go                   # Authentication-related DTOs
 │   │   ├── common.go                 # Shared DTO structures
 │   │   └── wallet.go                 # Wallet-related DTOs
-│   ├── infra
-│   │   ├── docker
-│   │   │   └── init-db.sql           # Initial database setup script for docker compose
-│   │   ├── postgres
-│   │   │   ├── postgres_connection.go # Postgres connection setup with pgx, returns *sql.DB
-│   │   │   └── postgres_migrations.go # Database migration handling with golang-migrate/v4
-│   │   ├── kafka
-│   │   │   └── sample.md             # Placeholder for Kafka integration
-│   │   ├── nats
-│   │   │   └── sample.md             # Placeholder for NATS integration
-│   │   └── redis
-│   │       └── sample.md             # Placeholder for Redis integration
 │   ├── secure
 │   │   ├── jwt.go                    # JWT token handling, genrate and validate tokens
 │   │   ├── password.go               # Password hashing and verification with bcrypt
@@ -95,6 +75,24 @@ command
 │       │   ├── routes.go             # Core routes setup
 │       │   └── wallet.go             # Wallet routes
 │       └── server.go                  # HTTP server setup with gin
+│   ├── infra
+│   │   ├── docker
+│   │   │   └── init-db.sql           # Initial database setup script for docker compose
+│   │   ├── postgres
+│   │   │   ├── postgres_connection.go # Postgres connection setup with pgx, returns *sql.DB
+│   │   │   └── postgres_migrations.go # Database migration handling with golang-migrate/v4
+│   │   ├── kafka
+│   │   │   └── sample.md             # Placeholder for Kafka integration
+│   │   └── redis
+│   │       └── sample.md             # Placeholder for Redis integration
+│   ├── common
+│   │   ├── app_errs.go               # Custom error types
+│   │   ├── config.go                 # Configuration management
+│   │   ├── constants.go              # Global constants
+│   │   ├── context_keys.go           # Context key definitions
+│   │   ├── custom_err_messages.go    # Error message definitions
+│   │   ├── slog_config.go            # Structured logging configuration
+│   │   └── timeouts.go               # Timeout constants
 ├── migrations
 │   ├── 000001_create_users_table.down.sql   # User table rollback
 │   ├── 000001_create_users_table.up.sql     # User table creation
