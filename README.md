@@ -35,12 +35,13 @@ Refer to **Makefile** for more details on development commands. Example: `make m
 - [golangci-lint](https://golangci-lint.run/): Linting (config: .golangci.yaml)
 
 
-## Project Structure (Domain Driven Design, Loosely Coupled, Clean Architecture)
+## Project Structure
 
-command
-`tree -a -I '.git|.DS_Store|.gitignore|.idea|docs|api-collections'`
+The project follows domain-driven design, loosely coupled clean architecture, suited for large codebase.
 
-```
+command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|docs|api-collections'`
+
+```bash
 ├── .github
 │   └── workflows
 │       └── test.yaml                 # CI/CD pipeline for running tests
@@ -56,25 +57,25 @@ command
 │   │   ├── common.go                 # Shared DTO structures
 │   │   └── wallet.go                 # Wallet-related DTOs
 │   ├── secure
-│   │   ├── jwt.go                    # JWT token handling, genrate and validate tokens
+│   │   ├── jwt.go                    # JWT token handling, generate and validate tokens
 │   │   ├── password.go               # Password hashing and verification with bcrypt
 │   │   └── password_test.go          # Password utility tests
-│   └── server
-│       ├── handlers
-│       │   ├── auth.go               # Login, Register handlers
-│       │   ├── helpers.go            # Handlers helper functions
-│       │   └── wallet.go             # Wallet HTTP handlers
-│       ├── middlewares
-│       │   ├── auth.go               # Auth middleware (Validate token, Set Authorized user in req context)
-│       │   ├── cors.go               # CORS middleware
-│       │   ├── gin_logger.go         # Custom Logging middleware for gin
-│       │   ├── middlewares.go        # Core Middleware setup
-│       │   └── request_id.go         # Request ID middleware, sets X-Request-ID header
-│       ├── routes
-│       │   ├── auth.go               # Authentication routes
-│       │   ├── routes.go             # Core routes setup
-│       │   └── wallet.go             # Wallet routes
-│       └── server.go                  # HTTP server setup with gin
+│   ├── server
+│   │   ├── handlers
+│   │   │   ├── auth.go               # Login, Register handlers
+│   │   │   ├── helpers.go            # Handlers helper functions
+│   │   │   └── wallet.go             # Wallet HTTP handlers
+│   │   ├── middlewares
+│   │   │   ├── auth.go               # Auth middleware (Validate token, Set Authorized user in req context)
+│   │   │   ├── cors.go               # CORS middleware
+│   │   │   ├── gin_logger.go         # Custom Logging middleware for gin
+│   │   │   ├── middlewares.go        # Core Middleware setup
+│   │   │   └── request_id.go         # Request ID middleware, sets X-Request-ID header
+│   │   ├── routes
+│   │   │   ├── auth.go               # Authentication routes
+│   │   │   ├── routes.go             # Core routes setup
+│   │   │   └── wallet.go             # Wallet routes
+│   │   └── server.go                 # HTTP server setup with gin
 │   ├── infra
 │   │   ├── docker
 │   │   │   └── init-db.sql           # Initial database setup script for docker compose
@@ -85,14 +86,14 @@ command
 │   │   │   └── sample.md             # Placeholder for Kafka integration
 │   │   └── redis
 │   │       └── sample.md             # Placeholder for Redis integration
-│   ├── common
-│   │   ├── app_errs.go               # Custom error types
-│   │   ├── config.go                 # Configuration management
-│   │   ├── constants.go              # Global constants
-│   │   ├── context_keys.go           # Context key definitions
-│   │   ├── custom_err_messages.go    # Error message definitions
-│   │   ├── slog_config.go            # Structured logging configuration
-│   │   └── timeouts.go               # Timeout constants
+│   └── common
+│       ├── app_errs.go               # Custom error types
+│       ├── config.go                 # Configuration management
+│       ├── constants.go              # Global constants
+│       ├── context_keys.go           # Context key definitions
+│       ├── custom_err_messages.go    # Error message definitions
+│       ├── slog_config.go            # Structured logging configuration
+│       └── timeouts.go               # Timeout constants
 ├── migrations
 │   ├── 000001_create_users_table.down.sql   # User table rollback
 │   ├── 000001_create_users_table.up.sql     # User table creation
@@ -101,7 +102,7 @@ command
 ├── scripts
 │   └── pre-push                      # Git pre-push hook (ensures run tests and lint before every push)
 ├── local-dev
-│   └── config.yaml.example          # Example configuration file (place it to project root as `config.yaml`)
+│   └── config.yaml.example           # Example configuration file (place it to project root as `config.yaml`)
 ├── config.yaml                       # Application configuration
 ├── main.go                           # Application entry point
 ├── Makefile                          # Development commands and shortcuts
@@ -109,7 +110,7 @@ command
 ├── compose.yaml                      # Docker Compose configuration
 ├── go.mod                            # Go module definition
 ├── go.sum                            # Go module checksums
-├── .air.toml                         # Live reload configuration with air
+└── .air.toml                         # Live reload configuration with air
 ```
 
 ## API Documentation
