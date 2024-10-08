@@ -75,3 +75,54 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		User: *createdUser,
 	})
 }
+
+// Login godoc
+// @Summary Authenticate a user and provide access tokens
+// @Description Verifies password using bcrypt comparison.
+// @Description Generates new JWT access token using ECDSA encryption.
+// @Description Sets HTTP-only cookie with new access token and and X-Request-Id header.
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param input body LoginRequest true "User login credentials"
+// @Success 200 {object} LoginResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /login [post]
+func (h *AuthHandler) Login(c *gin.Context) {
+	var req dto.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		slog.Error(common.ErrInvalidRequest, "err", formatValidationError(err))
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: formatValidationError(err)})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), common.Timeouts.Auth.Read)
+	defer cancel()
+
+	user, appErr := h.userRepo.FindBy(ctx, common.DBColumnEmail, req.Email)
+	if appErr != nil {
+		c.JSON(appErr.Code(), dto.ErrorResponse{Error: appErr.Error()})
+		return
+	}
+
+	if err := secure.VerifyPassword(user.PasswordHash, req.Password); err != nil {
+		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{Error: "Invalid credentials"})
+		return
+	}
+
+	accessToken, err := h.jwtManager.GenerateAccessToken(user.UUID.String())
+	if err != nil {
+		slog.Error("failed to generate access token", "err", err)
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: common.ErrUnexpectedServer})
+		return
+	}
+
+	c.SetCookie("accessToken", accessToken, int(h.jwtManager.AccessExpiration.Seconds()), "/", "", true, true)
+
+	c.JSON(http.StatusOK, dto.LoginResponse{
+		User: *user,
+	})
+}

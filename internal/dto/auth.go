@@ -38,3 +38,18 @@ func (r *RegisterUserRequest) ToUser(passwordHash string) *domain.User {
 type RegisterUserResponse struct {
 	User domain.User `json:"user"`
 }
+
+// LoginRequest represents the credentials required for user authentication.
+// @Description LoginRequest validates input for user login.
+// @Description Email must be a valid email address.
+// @Description Password is required.
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+// LoginResponse contains the user data returned after successful login.
+// @Description LoginResponse includes the authenticated user's details.
+type LoginResponse struct {
+	User domain.User `json:"user"`
+}
