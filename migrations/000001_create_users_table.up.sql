@@ -1,6 +1,15 @@
 CREATE TYPE user_status AS ENUM ('active', 'inactive', 'deleted');
 CREATE TYPE user_role AS ENUM ('admin', 'user', 'agent', 'merchant');
 
+-- Create the global update_updated_at() function, reusable for all tables
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     uuid UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
@@ -13,15 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE OR REPLACE FUNCTION update_users_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE TRIGGER trigger_users_update_updated_at
 BEFORE UPDATE ON users
 FOR EACH ROW
-EXECUTE FUNCTION update_users_updated_at();
+EXECUTE FUNCTION update_updated_at();
