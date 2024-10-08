@@ -135,3 +135,150 @@ Refer to **Makefile** for more details on development commands. Example: `make m
       "error": "An unexpected error occurred"
     }
     ```
+
+
+
+    ### Wallet Endpoints
+
+    #### Create a New Wallet
+    - **URL**: `/api/v1/users/{user_uuid}/wallets`
+    - **Method**: `POST`
+    - **Description**: Creates a new wallet for the specified user.
+    - **Authentication**: Required (Bearer Token)
+    - **Request Body**:
+      ```json
+      {
+        "currency": "USD"
+      }
+      ```
+    - **Success Response**: `201 Created`
+      ```json
+      {
+        "wallet": {
+          "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "balance": 0,
+          "currency": "USD",
+          "status": "active",
+          "createdAt": "2024-10-07T06:18:54.980941Z",
+          "updatedAt": "2024-10-07T06:18:54.980941Z"
+        }
+      }
+      ```
+    - **Error Responses**:
+      - `400 Bad Request`:
+        ```json
+        {
+          "error": "Invalid currency"
+        }
+        ```
+      - `401 Unauthorized`:
+        ```json
+        {
+          "error": "Authentication required"
+        }
+        ```
+      - `403 Forbidden`:
+        ```json
+        {
+          "error": "You can only create a wallet for yourself"
+        }
+        ```
+      - `409 Conflict`:
+        ```json
+        {
+          "error": "User already has a wallet for this currency"
+        }
+        ```
+      - `500 Internal Server Error`:
+        ```json
+        {
+          "error": "An unexpected error occurred"
+        }
+        ```
+
+    #### Get Wallet Balance
+    - **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/balance`
+    - **Method**: `GET`
+    - **Description**: Retrieves the balance of a specific wallet for a user.
+    - **Authentication**: Required (Bearer Token)
+    - **Success Response**: `200 OK`
+      ```json
+      {
+        "balance": 1000,
+        "currency": "USD"
+      }
+      ```
+    - **Error Responses**:
+      - `401 Unauthorized`:
+        ```json
+        {
+          "error": "Authentication required"
+        }
+        ```
+      - `403 Forbidden`:
+        ```json
+        {
+          "error": "You can only access your own wallet"
+        }
+        ```
+      - `404 Not Found`:
+        ```json
+        {
+          "error": "Wallet not found"
+        }
+        ```
+      - `500 Internal Server Error`:
+        ```json
+        {
+          "error": "An unexpected error occurred"
+        }
+        ```
+
+    #### Update Wallet Status
+    - **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/status`
+    - **Method**: `PUT`
+    - **Description**: Updates the status of a specific wallet for a user.
+    - **Authentication**: Required (Bearer Token)
+    - **Request Body**:
+      ```json
+      {
+        "status": "inactive"
+      }
+      ```
+    - **Success Response**: `200 OK`
+      ```json
+      {
+        "message": "Wallet status updated successfully"
+      }
+      ```
+    - **Error Responses**:
+      - `400 Bad Request`:
+        ```json
+        {
+          "error": "Invalid status"
+        }
+        ```
+      - `401 Unauthorized`:
+        ```json
+        {
+          "error": "Authentication required"
+        }
+        ```
+      - `403 Forbidden`:
+        ```json
+        {
+          "error": "You can only update your own wallet"
+        }
+        ```
+      - `404 Not Found`:
+        ```json
+        {
+          "error": "Wallet not found"
+        }
+        ```
+      - `500 Internal Server Error`:
+        ```json
+        {
+          "error": "An unexpected error occurred"
+        }
+        ```
