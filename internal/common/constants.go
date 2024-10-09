@@ -8,7 +8,8 @@ const (
 	RequestIDHeader = "X-Request-ID"
 	RequestIDKey    = "requestID"
 
-	DBTSLayout = "time.RFC3339"
+	DBTSLayout       = "time.RFC3339"
+	CardExpiryLayout = "01/06" // MM/YY
 
 	DBColumnID       = "id"
 	DBColumnUUID     = "uuid"
