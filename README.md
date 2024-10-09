@@ -19,6 +19,7 @@
 5. (Or) Run `make watch` to live reload the application with air.
 
 Refer to **Makefile** for more details on development commands. Example: `make migrate-create name=create-cards-table`
+Refer to **docs/guides** for development guides.
 
 ## Tools/Libraries Used
 
@@ -47,22 +48,27 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|docs|api-collections'`
 │       └── test.yaml                 # CI/CD pipeline for running tests
 ├── internal
 │   ├── domain
+│   │   ├── card.go                   # Card domain model
+│   │   ├── card_repository.go        # Card repository interface, database interactions
 │   │   ├── helpers.go                # Domain-specific helper functions
 │   │   ├── user.go                   # User domain model
-│   │   ├── user_repository.go        # User repository interface
+│   │   ├── user_repository.go        # User repository interface, database interactions
 │   │   ├── wallet.go                 # Wallet domain model
-│   │   └── wallet_repository.go      # Wallet repository interface
+│   │   └── wallet_repository.go      # Wallet repository interface, database interactions
 │   ├── dto
-│   │   ├── auth.go                   # Authentication-related DTOs
+│   │   ├── auth.go                   # Authentication-related DTOs/REST API Request Response Structurers
+│   │   ├── card.go                   # Card-related DTOs
 │   │   ├── common.go                 # Shared DTO structures
 │   │   └── wallet.go                 # Wallet-related DTOs
 │   ├── secure
+│   │   ├── card_aes.go               # Card AES-256 with GCM mode, Validate, Encrypt and Decrypt
 │   │   ├── jwt.go                    # JWT token handling, generate and validate tokens
 │   │   ├── password.go               # Password hashing and verification with bcrypt
 │   │   └── password_test.go          # Password utility tests
 │   ├── server
 │   │   ├── handlers
 │   │   │   ├── auth.go               # Login, Register handlers
+│   │   │   ├── auth.go               # Card http handlers
 │   │   │   ├── helpers.go            # Handlers helper functions
 │   │   │   └── wallet.go             # Wallet HTTP handlers
 │   │   ├── middlewares
@@ -73,19 +79,20 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|docs|api-collections'`
 │   │   │   └── request_id.go         # Request ID middleware, sets X-Request-ID header
 │   │   ├── routes
 │   │   │   ├── auth.go               # Authentication routes
+│   │   │   ├── auth.go               # Card routes
 │   │   │   ├── routes.go             # Core routes setup
 │   │   │   └── wallet.go             # Wallet routes
-│   │   └── server.go                 # HTTP server setup with gin
+│   │   └── server.go                  # HTTP server setup with gin
 │   ├── infra
 │   │   ├── docker
-│   │   │   └── init-db.sql           # Initial database setup script for docker compose
+│   │   │   └── init-db.sql               # Initial database setup script for docker compose
 │   │   ├── postgres
-│   │   │   ├── postgres_connection.go # Postgres connection setup with pgx, returns *sql.DB
-│   │   │   └── postgres_migrations.go # Database migration handling with golang-migrate/v4
+│   │   │   ├── postgres_connection.go    # Postgres connection setup with pgx, returns *sql.DB
+│   │   │   └── postgres_migrations.go    # Database migration handling with golang-migrate/v4
 │   │   ├── kafka
-│   │   │   └── sample.md             # Placeholder for Kafka integration
+│   │   │   └── sample.md                 # Placeholder for Kafka integration
 │   │   └── redis
-│   │       └── sample.md             # Placeholder for Redis integration
+│   │       └── sample.md                  # Placeholder for Redis integration
 │   └── common
 │       ├── app_errs.go               # Custom error types
 │       ├── config.go                 # Configuration management
@@ -99,6 +106,8 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|docs|api-collections'`
 │   ├── 000001_create_users_table.up.sql     # User table creation
 │   ├── 000002_create_wallets_table.down.sql # Wallet table rollback
 │   └── 000002_create_wallets_table.up.sql   # Wallet table creation
+│   ├── 000003_create_cards_table.down.sql   # Cards table rollback
+│   └── 000003_create_cards_table.up.sql     # Cards table creation
 ├── scripts
 │   └── pre-push                      # Git pre-push hook (ensures run tests and lint before every push)
 ├── local-dev
