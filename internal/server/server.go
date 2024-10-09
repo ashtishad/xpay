@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Server encapsulates all dependencies and configurations for the HTTP server.
 type Server struct {
 	Router     *gin.Engine
 	httpServer *http.Server
@@ -23,39 +24,32 @@ type Server struct {
 	Config     *common.AppConfig
 }
 
+// NewServer initializes and returns a new Server instance.
+// It sets up all necessary components including config, logger, database, router, and security modules.
 func NewServer(ctx context.Context) (*Server, error) {
 	cfg, err := common.LoadConfig()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
 
-	var logLevel = new(slog.LevelVar) // Info by default
-	h := slog.NewJSONHandler(os.Stderr, common.GetJSONHandlerOptions(logLevel))
-	slog.SetDefault(slog.New(h))
+	setupSlogger(cfg.App)
 
-	gin.SetMode(cfg.App.GinMode)
-	router := gin.New()
-
-	if gin.IsDebugging() {
-		logLevel.Set(slog.LevelDebug)
-	}
-
-	db, err := postgres.NewConnection(ctx, cfg.DB)
+	db, err := setupPostgres(ctx, cfg.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := postgres.RunMigrations(ctx, db); err != nil {
-		slog.Warn("failed to run migrations", "err", err)
-		return nil, err
-	}
+	router := setupRouter(cfg.App)
 
 	jwtManager, err := secure.NewJWTManager(&cfg.JWT)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create JWT manager: %w", err)
 	}
 
-	_ = router.SetTrustedProxies(nil)
+	cardEncryptor, err := secure.NewCardEncryptor(cfg.Card.AESKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create card encryptor: %w", err)
+	}
 
 	s := &Server{
 		Router: router,
@@ -71,27 +65,76 @@ func NewServer(ctx context.Context) (*Server, error) {
 	}
 
 	s.setupMiddlewares()
-
-	s.setupRoutes(jwtManager)
+	s.setupRoutes(jwtManager, cardEncryptor)
 
 	slog.Info(fmt.Sprintf("Swagger Specs available at %s/swagger/index.html", s.httpServer.Addr))
 
 	return s, nil
 }
 
+// setupSlogger configures the global logger based on the application environment.
+// It uses a text handler for development and a JSON handler for other environments.
+func setupSlogger(appSettings common.AppSettings) {
+	var logLevel = new(slog.LevelVar) // Info by default
+	var handler slog.Handler
+
+	if appSettings.Env == common.AppEnvDev {
+		handler = slog.NewTextHandler(os.Stderr, common.GetTextHandlerOptions(logLevel))
+	} else {
+		handler = slog.NewJSONHandler(os.Stderr, common.GetJSONHandlerOptions(logLevel))
+	}
+
+	logger := slog.New(handler)
+	slog.SetDefault(logger)
+
+	if appSettings.GinMode == gin.DebugMode {
+		logLevel.Set(slog.LevelDebug)
+	}
+}
+
+// setupPostgres establishes a connection to the PostgreSQL database and runs migrations.
+// It returns a database connection pool (*sql.DB) on success.
+func setupPostgres(ctx context.Context, dbConfig common.DBConfig) (*sql.DB, error) {
+	db, err := postgres.NewConnection(ctx, dbConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	if err := postgres.RunMigrations(ctx, db); err != nil {
+		slog.Warn("failed to run migrations", "err", err)
+		return nil, fmt.Errorf("failed to run migrations: %w", err)
+	}
+
+	return db, nil
+}
+
+// setupRouter initializes and configures the Gin router.
+// It sets the Gin mode based on the application settings and disables trusted proxies.
+func setupRouter(appSettings common.AppSettings) *gin.Engine {
+	gin.SetMode(appSettings.GinMode)
+	router := gin.New()
+	_ = router.SetTrustedProxies(nil)
+	return router
+}
+
+// setupMiddlewares adds all necessary middlewares to the Gin router.
 func (s *Server) setupMiddlewares() {
 	s.Router.Use(middlewares.InitMiddlewares()...)
 }
 
-func (s *Server) setupRoutes(jm *secure.JWTManager) {
+// setupRoutes initializes all API routes for the server.
+func (s *Server) setupRoutes(jm *secure.JWTManager, cardEncryptor *secure.CardEncryptor) {
 	apiGroup := s.Router.Group("/api/v1")
-	routes.InitRoutes(apiGroup, s.DB, s.Config, jm)
+	routes.InitRoutes(apiGroup, s.DB, s.Config, jm, cardEncryptor)
 }
 
+// Start begins listening for HTTP requests on the configured address.
 func (s *Server) Start() error {
 	return s.httpServer.ListenAndServe()
 }
 
+// Shutdown gracefully stops the server, closing the database connection and stopping the HTTP server.
+// It uses the provided context for timeout control.
 func (s *Server) Shutdown(ctx context.Context) error {
 	if err := s.DB.Close(); err != nil {
 		slog.Error("failed to close database connection", "error", err)

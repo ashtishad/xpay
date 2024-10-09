@@ -253,4 +253,141 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|docs|api-collections'`
   - `403 Forbidden`: `{"error": "You can only update your own wallet"}`
   - `404 Not Found`: `{"error": "Wallet not found"}`
   - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
-```
+
+
+### Card Endpoints
+
+#### Add a New Card to Wallet
+- **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/cards`
+- **Method**: `POST`
+- **Description**: Adds a new card to the specified wallet, encrypting sensitive data.
+- **Authentication**: Required (Bearer Token)
+- **Request Body**:
+  ```json
+  {
+    "cardNumber": "4111111111111111",
+    "provider": "visa",
+    "type": "credit",
+    "expiryDate": "12/25",
+    "cvv": "123"
+  }
+  ```
+- **Success Response**: `201 Created`
+  ```json
+  {
+    "card": {
+      "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "provider": "visa",
+      "type": "credit",
+      "lastFour": "1111",
+      "expiryDate": "12/25",
+      "status": "active",
+      "createdAt": "2024-10-07T06:18:54.980941Z",
+      "updatedAt": "2024-10-07T06:18:54.980941Z"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400 Bad Request`: `{"error": "Invalid card details"}`
+  - `401 Unauthorized`: `{"error": "Authentication required"}`
+  - `403 Forbidden`: `{"error": "You can only add cards to your own wallet"}`
+  - `404 Not Found`: `{"error": "Wallet not found"}`
+  - `409 Conflict`: `{"error": "A card of this type and provider already exists"}`
+  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+
+#### Get Card Details
+- **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/cards/{card_uuid}`
+- **Method**: `GET`
+- **Description**: Retrieves details of a specific card.
+- **Authentication**: Required (Bearer Token)
+- **Success Response**: `200 OK`
+  ```json
+  {
+    "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "provider": "visa",
+    "type": "credit",
+    "lastFour": "1111",
+    "expiryDate": "12/25",
+    "status": "active",
+    "createdAt": "2024-10-07T06:18:54.980941Z",
+    "updatedAt": "2024-10-07T06:18:54.980941Z"
+  }
+  ```
+- **Error Responses**:
+  - `401 Unauthorized`: `{"error": "Authentication required"}`
+  - `403 Forbidden`: `{"error": "You can only access your own cards"}`
+  - `404 Not Found`: `{"error": "Card not found"}`
+  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+
+#### Update Card Details
+- **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/cards/{card_uuid}`
+- **Method**: `PATCH`
+- **Description**: Updates the details of a specific card.
+- **Authentication**: Required (Bearer Token)
+- **Request Body**:
+  ```json
+  {
+    "expiryDate": "12/26",
+    "status": "inactive"
+  }
+  ```
+- **Success Response**: `200 OK`
+  ```json
+  {
+    "message": "Card updated successfully"
+  }
+  ```
+- **Error Responses**:
+  - `400 Bad Request`: `{"error": "Invalid update details"}`
+  - `401 Unauthorized`: `{"error": "Authentication required"}`
+  - `403 Forbidden`: `{"error": "You can only update your own cards"}`
+  - `404 Not Found`: `{"error": "Card not found"}`
+  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+
+#### Delete Card
+- **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/cards/{card_uuid}`
+- **Method**: `DELETE`
+- **Description**: Soft deletes a specific card.
+- **Authentication**: Required (Bearer Token)
+- **Success Response**: `200 OK`
+  ```json
+  {
+    "message": "Card deleted successfully"
+  }
+  ```
+- **Error Responses**:
+  - `401 Unauthorized`: `{"error": "Authentication required"}`
+  - `403 Forbidden`: `{"error": "You can only delete your own cards"}`
+  - `404 Not Found`: `{"error": "Card not found"}`
+  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+
+#### List Cards
+- **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/cards`
+- **Method**: `GET`
+- **Description**: Retrieves a list of cards for a specific wallet.
+- **Authentication**: Required (Bearer Token)
+- **Query Parameters**:
+  - `provider` (optional): Filter by card provider
+  - `status` (optional): Filter by card status
+- **Success Response**: `200 OK`
+  ```json
+  {
+    "cards": [
+      {
+        "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "provider": "visa",
+        "type": "credit",
+        "lastFour": "1111",
+        "expiryDate": "12/25",
+        "status": "active",
+        "createdAt": "2024-10-07T06:18:54.980941Z",
+        "updatedAt": "2024-10-07T06:18:54.980941Z"
+      },
+      // ... more cards
+    ]
+  }
+  ```
+- **Error Responses**:
+  - `401 Unauthorized`: `{"error": "Authentication required"}`
+  - `403 Forbidden`: `{"error": "You can only list cards from your own wallet"}`
+  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
