@@ -4,7 +4,7 @@
 
 **How**: Use specific version tags for base images.
 ```dockerfile
-FROM golang:1.23.1-alpine3.20 AS builder
+FROM golang:1.23.2-alpine3.20 AS builder
 ```
 
 **Why**: Ensures reproducibility and prevents unexpected changes from image updates.
@@ -47,7 +47,7 @@ RUN go mod download && go mod verify
 **How**: Copy application code and build the binary.
 ```dockerfile
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o xpay main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o xm main.go
 ```
 
 **Why**: Builds a statically-linked binary optimized for size.
@@ -58,7 +58,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o xpay main.go
 
 ## 5. Multi-stage Build
 
-**How**: Use same tag for alpine image from the build stage.
+**How**: Use the same Alpine version as the build stage for the final image.
 ```dockerfile
 FROM alpine:3.20
 ```
@@ -73,8 +73,9 @@ FROM alpine:3.20
 
 **How**: Create and switch to a non-root user.
 ```dockerfile
-RUN adduser -D appuser
-USER appuser
+RUN adduser -D ash
+USER ash
+WORKDIR /home/ash
 ```
 
 **Why**: Enhances security by limiting potential damage from container breakouts.
@@ -89,7 +90,7 @@ USER appuser
 ```dockerfile
 COPY --chown=ash:ash --from=builder /app/ .
 COPY --chown=ash:ash --from=builder /app/migrations ./migrations
-COPY --chown=ash:ash --from=builder /app/app.env .
+COPY --chown=ash:ash --from=builder /app/config.yaml .
 ```
 
 **Why**: Ensures the application files are owned by the non-root user.
@@ -111,24 +112,11 @@ EXPOSE 8080
 
 [Reference: EXPOSE Instruction](https://docs.docker.com/engine/reference/builder/#expose)
 
-## 9. Health Checks
-
-**How**: Add a health check command.
-```dockerfile
-HEALTHCHECK CMD curl --fail http://localhost:8080/health || exit 1
-```
-
-**Why**: Allows Docker to monitor the health of your application.
-
-**Best Practice**: Implement a lightweight health check endpoint in your application.
-
-[Reference: HEALTHCHECK Instruction](https://docs.docker.com/engine/reference/builder/#healthcheck)
-
-## 10. Entrypoint and CMD
+## 9. Entrypoint and CMD
 
 **How**: Set the entrypoint for your application.
 ```dockerfile
-ENTRYPOINT ["/home/appuser/xpay"]
+ENTRYPOINT ["/home/ash/xm"]
 CMD []
 ```
 
