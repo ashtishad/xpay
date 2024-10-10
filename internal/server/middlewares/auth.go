@@ -54,3 +54,35 @@ func AuthMiddleware(userRepo domain.UserRepository, jwtPublicKey *ecdsa.PublicKe
 		c.Next()
 	}
 }
+
+// AdminAuthMiddleware ensures that only users with admin role can access the protected routes.
+// It builds upon the AuthMiddleware by performing these additional steps:
+// 1. Runs the standard AuthMiddleware to authenticate the user.
+// 2. Retrieves the authenticated user from the gin context.
+// 3. Verifies if the authenticated user has the admin role.
+// 4. Aborts the request if the user is not an admin, otherwise allows it to proceed.
+func AdminAuthMiddleware(userRepo domain.UserRepository, jwtPublicKey *ecdsa.PublicKey) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		AuthMiddleware(userRepo, jwtPublicKey)(c)
+
+		if c.IsAborted() {
+			return
+		}
+
+		user, exists := c.Get(common.ContextKeyAuthorizedUser)
+		if !exists {
+			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "User not found in context"})
+			c.Abort()
+			return
+		}
+
+		authorizedUser, ok := user.(*domain.User)
+		if !ok || authorizedUser.Role != domain.UserRoleAdmin {
+			c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "Admin access required"})
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
