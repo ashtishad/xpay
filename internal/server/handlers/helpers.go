@@ -42,26 +42,6 @@ func validateUserAccess(c *gin.Context) (*domain.User, common.AppError) {
 	return authorizedUser, nil
 }
 
-// validateAdminAccess checks if the authenticated user is an admin
-func validateAdminAccess(c *gin.Context) (*domain.User, common.AppError) {
-	authUser, exists := c.Get(common.ContextKeyAuthorizedUser)
-	if !exists {
-		return nil, common.NewUnauthorizedError("User not authenticated")
-	}
-
-	authorizedUser, ok := authUser.(*domain.User)
-	if !ok {
-		slog.Error("failed to cast authorized user")
-		return nil, common.NewInternalServerError("Unexpected server error", nil)
-	}
-
-	if authorizedUser.Role != domain.UserRoleAdmin {
-		return nil, common.NewForbiddenError("Admin access required")
-	}
-
-	return authorizedUser, nil
-}
-
 // formatValidationError formats validation errors into a single string
 func formatValidationError(err error) string {
 	var validationErrors validator.ValidationErrors

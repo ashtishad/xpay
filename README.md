@@ -214,6 +214,7 @@ For detailed information on various aspects of the project, refer to the followi
 - **URL**: `/api/v1/register`
 - **Method**: `POST`
 - **Description**: Registers a new user with hashed password, generates JWT tokens, sets an HTTP-only cookie and X-Request-Id header.
+- **Access**: Public
 - **Request Body**:
   ```json
   {
@@ -223,28 +224,13 @@ For detailed information on various aspects of the project, refer to the followi
   }
   ```
 - **Success Response**: `201 Created`
-  ```json
-  {
-    "user": {
-      "uuid": "92e275af-4803-4929-968c-3feb25e038d3",
-      "fullName": "John Doe",
-      "email": "someone@example.com",
-      "status": "active",
-      "role": "user",
-      "createdAt": "2024-10-07T06:18:54.980941Z",
-      "updatedAt": "2024-10-07T06:18:54.980941Z"
-    }
-  }
-  ```
-- **Error Responses**:
-  - `400 Bad Request`: `{"error": "FullName must be at least 3 characters. Email must be a valid email. Password must be at least 8 characters"}`
-  - `409 Conflict`: `{"error": "user with this email already exists"}`
-  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+- **Error Responses**: `400 Bad Request`, `409 Conflict`, `500 Internal Server Error`
 
 #### Login
 - **URL**: `/api/v1/login`
 - **Method**: `POST`
 - **Description**: Authenticate a user, verifies password, generates JWT token, sets an HTTP-only cookie and X-Request-Id header.
+- **Access**: Public
 - **Request Body**:
   ```json
   {
@@ -253,31 +239,34 @@ For detailed information on various aspects of the project, refer to the followi
   }
   ```
 - **Success Response**: `200 OK`
+- **Error Responses**: `400 Bad Request`, `401 Unauthorized`, `404 Not Found`, `500 Internal Server Error`
+
+### User Management Endpoints
+
+#### Create User with Specific Role
+- **URL**: `/api/v1/users`
+- **Method**: `POST`
+- **Description**: Creates a new user with a specific role.
+- **Access**: Admin (can create any role), Agent (can create user or merchant roles)
+- **Authentication**: Required (Bearer Token)
+- **Request Body**:
   ```json
   {
-    "user": {
-      "uuid": "92e275af-4803-4929-968c-3feb25e038d3",
-      "fullName": "John Doe",
-      "email": "someone@example.com",
-      "status": "active",
-      "role": "user",
-      "createdAt": "2024-10-07T06:18:54.980941Z",
-      "updatedAt": "2024-10-07T06:18:54.980941Z"
-    }
+    "fullName": "Keanu Reeves",
+    "email": "keanu@example.com",
+    "password": "keanupass",
+    "role": "admin"
   }
   ```
-- **Error Responses**:
-  - `400 Bad Request`: `{"error": "Email must be a valid email. Password must be at least 8 characters"}`
-  - `401 Unauthorized`: `{"error": "Invalid credentials"}`
-  - `404 Not Found`: `{"error": "user not found"}`
-  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+- **Success Response**: `201 Created`
+- **Error Responses**: `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `409 Conflict`, `500 Internal Server Error`
 
 ### Wallet Endpoints
 
 #### Create a New Wallet
 - **URL**: `/api/v1/users/{user_uuid}/wallets`
 - **Method**: `POST`
-- **Description**: Creates a new wallet for the specified user.
+- **Access**: Admin, Merchant, User
 - **Authentication**: Required (Bearer Token)
 - **Request Body**:
   ```json
@@ -286,47 +275,20 @@ For detailed information on various aspects of the project, refer to the followi
   }
   ```
 - **Success Response**: `201 Created`
-  ```json
-  {
-    "wallet": {
-      "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-      "balance": 0,
-      "currency": "USD",
-      "status": "active",
-      "createdAt": "2024-10-07T06:18:54.980941Z",
-      "updatedAt": "2024-10-07T06:18:54.980941Z"
-    }
-  }
-  ```
-- **Error Responses**:
-  - `400 Bad Request`: `{"error": "Invalid currency"}`
-  - `401 Unauthorized`: `{"error": "Authentication required"}`
-  - `403 Forbidden`: `{"error": "You can only create a wallet for yourself"}`
-  - `409 Conflict`: `{"error": "User already has a wallet for this currency"}`
-  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+- **Error Responses**: `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `409 Conflict`, `500 Internal Server Error`
 
 #### Get Wallet Balance
 - **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/balance`
 - **Method**: `GET`
-- **Description**: Retrieves the balance of a specific wallet for a user.
+- **Access**: Admin, Agent, Merchant, User (own wallet only)
 - **Authentication**: Required (Bearer Token)
 - **Success Response**: `200 OK`
-  ```json
-  {
-    "balance": 1000,
-    "currency": "USD"
-  }
-  ```
-- **Error Responses**:
-  - `401 Unauthorized`: `{"error": "Authentication required"}`
-  - `403 Forbidden`: `{"error": "You can only access your own wallet"}`
-  - `404 Not Found`: `{"error": "Wallet not found"}`
-  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+- **Error Responses**: `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`
 
 #### Update Wallet Status
 - **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/status`
-- **Method**: `PUT`
-- **Description**: Updates the status of a specific wallet for a user.
+- **Method**: `PATCH`
+- **Access**: Admin, Agent, Merchant, User (own wallet only)
 - **Authentication**: Required (Bearer Token)
 - **Request Body**:
   ```json
@@ -335,25 +297,14 @@ For detailed information on various aspects of the project, refer to the followi
   }
   ```
 - **Success Response**: `200 OK`
-  ```json
-  {
-    "message": "Wallet status updated successfully"
-  }
-  ```
-- **Error Responses**:
-  - `400 Bad Request`: `{"error": "Invalid status"}`
-  - `401 Unauthorized`: `{"error": "Authentication required"}`
-  - `403 Forbidden`: `{"error": "You can only update your own wallet"}`
-  - `404 Not Found`: `{"error": "Wallet not found"}`
-  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
-
+- **Error Responses**: `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`
 
 ### Card Endpoints
 
 #### Add a New Card to Wallet
 - **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/cards`
 - **Method**: `POST`
-- **Description**: Adds a new card to the specified wallet, encrypting sensitive data.
+- **Access**: Admin, Merchant, User (own wallet only)
 - **Authentication**: Required (Bearer Token)
 - **Request Body**:
   ```json
@@ -366,56 +317,20 @@ For detailed information on various aspects of the project, refer to the followi
   }
   ```
 - **Success Response**: `201 Created`
-  ```json
-  {
-    "card": {
-      "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-      "provider": "visa",
-      "type": "credit",
-      "lastFour": "1111",
-      "expiryDate": "12/25",
-      "status": "active",
-      "createdAt": "2024-10-07T06:18:54.980941Z",
-      "updatedAt": "2024-10-07T06:18:54.980941Z"
-    }
-  }
-  ```
-- **Error Responses**:
-  - `400 Bad Request`: `{"error": "Invalid card details"}`
-  - `401 Unauthorized`: `{"error": "Authentication required"}`
-  - `403 Forbidden`: `{"error": "You can only add cards to your own wallet"}`
-  - `404 Not Found`: `{"error": "Wallet not found"}`
-  - `409 Conflict`: `{"error": "A card of this type and provider already exists"}`
-  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+- **Error Responses**: `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `409 Conflict`, `500 Internal Server Error`
 
 #### Get Card Details
 - **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/cards/{card_uuid}`
 - **Method**: `GET`
-- **Description**: Retrieves details of a specific card.
+- **Access**: Admin, Agent (read-only), Merchant, User (own cards only)
 - **Authentication**: Required (Bearer Token)
 - **Success Response**: `200 OK`
-  ```json
-  {
-    "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    "provider": "visa",
-    "type": "credit",
-    "lastFour": "1111",
-    "expiryDate": "12/25",
-    "status": "active",
-    "createdAt": "2024-10-07T06:18:54.980941Z",
-    "updatedAt": "2024-10-07T06:18:54.980941Z"
-  }
-  ```
-- **Error Responses**:
-  - `401 Unauthorized`: `{"error": "Authentication required"}`
-  - `403 Forbidden`: `{"error": "You can only access your own cards"}`
-  - `404 Not Found`: `{"error": "Card not found"}`
-  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+- **Error Responses**: `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`
 
 #### Update Card Details
 - **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/cards/{card_uuid}`
 - **Method**: `PATCH`
-- **Description**: Updates the details of a specific card.
+- **Access**: Admin, Merchant, User (own cards only)
 - **Authentication**: Required (Bearer Token)
 - **Request Body**:
   ```json
@@ -425,123 +340,26 @@ For detailed information on various aspects of the project, refer to the followi
   }
   ```
 - **Success Response**: `200 OK`
-  ```json
-  {
-    "message": "Card updated successfully"
-  }
-  ```
-- **Error Responses**:
-  - `400 Bad Request`: `{"error": "Invalid update details"}`
-  - `401 Unauthorized`: `{"error": "Authentication required"}`
-  - `403 Forbidden`: `{"error": "You can only update your own cards"}`
-  - `404 Not Found`: `{"error": "Card not found"}`
-  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+- **Error Responses**: `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`
 
 #### Delete Card
 - **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/cards/{card_uuid}`
 - **Method**: `DELETE`
-- **Description**: Soft deletes a specific card.
+- **Access**: Admin, Merchant, User (own cards only)
 - **Authentication**: Required (Bearer Token)
 - **Success Response**: `200 OK`
-  ```json
-  {
-    "message": "Card deleted successfully"
-  }
-  ```
-- **Error Responses**:
-  - `401 Unauthorized`: `{"error": "Authentication required"}`
-  - `403 Forbidden`: `{"error": "You can only delete your own cards"}`
-  - `404 Not Found`: `{"error": "Card not found"}`
-  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+- **Error Responses**: `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `500 Internal Server Error`
 
 #### List Cards
 - **URL**: `/api/v1/users/{user_uuid}/wallets/{wallet_uuid}/cards`
 - **Method**: `GET`
-- **Description**: Retrieves a list of cards for a specific wallet.
+- **Access**: Admin, Agent (read-only), Merchant, User (own wallet only)
 - **Authentication**: Required (Bearer Token)
 - **Query Parameters**:
   - `provider` (optional): Filter by card provider
   - `status` (optional): Filter by card status
 - **Success Response**: `200 OK`
-  ```json
-  {
-      "cards": [
-          {
-              "uuid": "93289d24-1c46-4a05-b92c-2ce2284e6462",
-              "provider": "mastercard",
-              "type": "credit",
-              "lastFour": "4444",
-              "expiryDate": "11/26",
-              "status": "active",
-              "createdAt": "2024-10-10T06:04:31.807741+06:00",
-              "updatedAt": "2024-10-10T06:05:59.505754+06:00"
-          },
-          {
-              "uuid": "790dc5de-6d9f-44be-9edb-2579ab8bfb5a",
-              "provider": "amex",
-              "type": "credit",
-              "lastFour": "8431",
-              "expiryDate": "12/25",
-              "status": "active",
-              "createdAt": "2024-10-10T06:04:27.99682+06:00",
-              "updatedAt": "2024-10-10T06:04:27.99682+06:00"
-          },
-          {
-              "uuid": "77c9c9b9-4fe6-4d51-af7f-72ae5a181fc6",
-              "provider": "visa",
-              "type": "credit",
-              "lastFour": "1111",
-              "expiryDate": "12/25",
-              "status": "active",
-              "createdAt": "2024-10-10T06:04:20.158023+06:00",
-              "updatedAt": "2024-10-10T06:04:20.158023+06:00"
-          }
-      ]
-  }
-  ```
-- **Error Responses**:
-  - `401 Unauthorized`: `{"error": "Authentication required"}`
-  - `403 Forbidden`: `{"error": "You can only list cards from your own wallet"}`
-  - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
-
-  ### User Management Endpoints
-
-  #### Create User with Specific Role
-  - **URL**: `/api/v1/users`
-  - **Method**: `POST`
-  - **Description**: Creates a new user with a specific role (admin, agent, or merchant). Only admins can perform this action and an admin can create another admin.
-  - **Authentication**: Required (Bearer Token)
-  - **Authorization**: Admin only
-  - **Request Body**:
-    ```json
-    {
-        "fullName": "Keanu Reeves",
-        "email": "keanu@example.com",
-        "password": "keanupass",
-        "role": "admin"
-    }
-    ```
-  - **Success Response**: `201 Created`
-    ```json
-    {
-      "user": {
-          "uuid": "3414e162-62f1-40fa-b66f-e077587b74a4",
-          "fullName": "Keanu Reeves",
-          "email": "keanu@example.com",
-          "status": "active",
-          "role": "admin",
-          "createdAt": "2024-10-10T17:52:41.777578Z",
-          "updatedAt": "2024-10-10T17:52:41.777578Z"
-        }
-    }
-    ```
-  - **Error Responses**:
-    - `400 Bad Request`: `{"error": "Invalid input. FullName must be at least 3 characters. Email must be valid. Password must be at least 8 characters. Role must be admin, agent, or merchant."}`
-    - `401 Unauthorized`: `{"error": "Authentication required"}`
-    - `403 Forbidden`: `{"error": "Admin access required"}`
-    - `409 Conflict`: `{"error": "User with this email already exists"}`
-    - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
-
+- **Error Responses**: `401 Unauthorized`, `403 Forbidden`, `500 Internal Server Error`
 
 </details>
 

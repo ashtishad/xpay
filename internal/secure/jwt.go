@@ -38,6 +38,7 @@ func NewJWTManager(config *common.JWTConfig) (*JWTManager, error) {
 
 type JWTClaims struct {
 	UserUUID string
+	UserRole string
 	jwt.RegisteredClaims
 }
 
@@ -47,13 +48,14 @@ func (jm *JWTManager) GetPublicKey() *ecdsa.PublicKey {
 }
 
 // GenerateAccessToken returns signed jwt token string
-func (jm *JWTManager) GenerateAccessToken(userUUID string) (string, error) {
+func (jm *JWTManager) GenerateAccessToken(userUUID string, userRole string) (string, error) {
 	if err := uuid.Validate(userUUID); err != nil {
 		return "", errors.New("invalid user uuid")
 	}
 
 	claims := JWTClaims{
 		UserUUID: userUUID,
+		UserRole: userRole,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(jm.AccessExpiration)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
