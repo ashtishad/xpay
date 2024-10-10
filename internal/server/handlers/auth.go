@@ -64,7 +64,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := h.jwtManager.GenerateAccessToken(createdUser.UUID.String())
+	accessToken, err := h.jwtManager.GenerateAccessToken(createdUser.UUID.String(), createdUser.Role)
 	if err != nil {
 		slog.Error("failed to generate access token", "requestID", requestID, "error", err.Error())
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: common.ErrUnexpectedServer})
@@ -118,7 +118,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := h.jwtManager.GenerateAccessToken(user.UUID.String())
+	accessToken, err := h.jwtManager.GenerateAccessToken(user.UUID.String(), user.Role)
 	if err != nil {
 		slog.Error("failed to generate access token", "requestID", requestID, "error", err.Error())
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: common.ErrUnexpectedServer})
