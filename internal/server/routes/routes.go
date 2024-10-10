@@ -15,6 +15,7 @@ func InitRoutes(rg *gin.RouterGroup, db *sql.DB, config *common.AppConfig, jm *s
 	cardRepo := domain.NewCardRepository(db)
 
 	registerAuthRoutes(rg, userRepo, jm)
+	registerUserManagementRoutes(rg, userRepo, jm.GetPublicKey())
 	registerWalletRoutes(rg, walletRepo, userRepo, jm.GetPublicKey())
 	registerCardRoutes(rg, cardRepo, walletRepo, userRepo, jm.GetPublicKey(), cardEncryptor)
 }
