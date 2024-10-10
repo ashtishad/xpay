@@ -504,6 +504,45 @@ For detailed information on various aspects of the project, refer to the followi
   - `403 Forbidden`: `{"error": "You can only list cards from your own wallet"}`
   - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
 
+  ### User Management Endpoints
+
+  #### Create User with Specific Role
+  - **URL**: `/api/v1/users`
+  - **Method**: `POST`
+  - **Description**: Creates a new user with a specific role (admin, agent, or merchant). Only admins can perform this action and an admin can create another admin.
+  - **Authentication**: Required (Bearer Token)
+  - **Authorization**: Admin only
+  - **Request Body**:
+    ```json
+    {
+        "fullName": "Keanu Reeves",
+        "email": "keanu@example.com",
+        "password": "keanupass",
+        "role": "admin"
+    }
+    ```
+  - **Success Response**: `201 Created`
+    ```json
+    {
+      "user": {
+          "uuid": "3414e162-62f1-40fa-b66f-e077587b74a4",
+          "fullName": "Keanu Reeves",
+          "email": "keanu@example.com",
+          "status": "active",
+          "role": "admin",
+          "createdAt": "2024-10-10T17:52:41.777578Z",
+          "updatedAt": "2024-10-10T17:52:41.777578Z"
+        }
+    }
+    ```
+  - **Error Responses**:
+    - `400 Bad Request`: `{"error": "Invalid input. FullName must be at least 3 characters. Email must be valid. Password must be at least 8 characters. Role must be admin, agent, or merchant."}`
+    - `401 Unauthorized`: `{"error": "Authentication required"}`
+    - `403 Forbidden`: `{"error": "Admin access required"}`
+    - `409 Conflict`: `{"error": "User with this email already exists"}`
+    - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+
+
 </details>
 
 [Back to Top](#top)
