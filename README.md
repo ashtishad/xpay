@@ -4,8 +4,10 @@
 ## Table of Contents
 - [Quick Start](#quick-start)
 - [Tools/Libraries Used](#toolslibraries-used)
-- [Progress Tracking](#progress-tracking)
-- [Project Structure](#project-structure)
+- [Progress](#progress)
+- [Architecture and Request Flow](#architecture-and-request-flow)
+- [Directory Structure](#directory-structure)
+- [Wiki](#wiki)
 - [API Documentation](#api-documentation)
 
 ## Quick Start
@@ -46,7 +48,7 @@ Refer to **Makefile** for more details on development commands. Example: `make m
 
 </details>
 
-## Progress Tracking
+## Progress
 
 ✅ Implemented | 🔄 In Progress/Planned
 
@@ -183,12 +185,12 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 
 <a href="#top">Back to Top</a>
 
-## Development Guides
+## Wiki
 
 For detailed information on various aspects of the project, refer to the following guides:
 
 <details>
-<summary>Click to expand Development Guides</summary>
+<summary>Click to expand Wiki</summary>
 
 - [Configuration Management](https://github.com/ashtishad/xpay/blob/main/guides/config.md): Learn how to manage application configuration using Viper.
 
