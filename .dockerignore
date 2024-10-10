@@ -13,4 +13,4 @@
 infra/docker/
 
 !docs/
-docs/guides
+docs/wiki
