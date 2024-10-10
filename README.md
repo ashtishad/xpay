@@ -26,8 +26,8 @@ Refer to **docs/guides** for development guides.
 #### Used in the Core API
 - [Gin](https://github.com/gin-gonic/gin): HTTP routing and middleware.
 - [pgx](https://github.com/jackc/pgx): Database driver and connection pooling, using standard *sql.DB handle.
-- [golang-jwt](https://github.com/golang-jwt/jwt/): JSON Web Token handling.
 - [golang-migrate](https://github.com/golang-migrate/migrate): Database migrations.
+- [golang-jwt](https://github.com/golang-jwt/jwt/): JSON Web Token handling.
 - [viper](https://github.com/spf13/viper): For configuration management. (config: config.yaml)
 
 #### Development Tools
@@ -35,12 +35,24 @@ Refer to **docs/guides** for development guides.
 - [Air](https://github.com/cosmtrek/air): Live reloading. (config: .air.toml)
 - [golangci-lint](https://golangci-lint.run/): Linting (config: .golangci.yaml)
 
+## Progress Tracking
+
+✅ Implemented | 🔄 In Progress/Planned
+
+| Area | Features and Best Practices | Status |
+|------|------------------------------|--------|
+| API Design & Architecture | • Domain Driven Design with clear bounded contexts<br>• RESTful API design<br>• Event streaming with Apache Kafka<br>• OpenAPI 3.0 specifications | ✅<br>✅<br>🔄<br>✅ |
+| Security | • ES256 JWT with asymmetric key pairs<br>• AES-256-GCM for card data encryption<br>• SQL injection prevention with parameterized queries<br>• DTO for controlled data to the client<br>• Route protection with Auth middleware<br>• Input and query param validation<br>• Rate limiting with Leaky Bucket algorithm | ✅<br>✅<br>✅<br>✅<br>✅<br>✅<br>🔄 |
+| Database | • ACID transactions with appropriate isolation levels<br>• Raw SQL for performance<br>• Connection pooling with pgx, exposing standard *sql.DB<br>• Optimized indexing and unique constraints<br>• Version-controlled schema changes with migrations | ✅<br>✅<br>✅<br>✅<br>✅ |
+| Core Operations & Observability | • Custom AppError interface for error handling<br>• Centralized configuration management with Viper<br>• Structured logging with slog<br>• Context timeout for preventing deadlocks and tracking performace <br>• Comprehensive test coverage<br>• Code quality with golangci-lint | ✅<br>✅<br>✅<br>✅<br>🔄<br>✅ |
+| Payment Gateways | • Idempotent payment processing<br>• Stripe integration<br>• PayPal integration<br>• Webhook handling for asynchronous events | 🔄<br>🔄<br>🔄<br>🔄 |
+| Deployment & Monitoring | • GitHub Actions CI pipeline<br>• AWS RDS with PostgreSQL<br>• ECS Fargate for serverless container deployment<br>• Prometheus metrics and Grafana dashboards<br>• Multi-stage Docker builds for minimal image size | ✅<br>🔄<br>🔄<br>🔄<br>✅ |
 
 ## Project Structure
 
 The project follows domain-driven design, loosely coupled clean architecture, suited for large codebase.
 
-command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|docs|api-collections'`
+command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 
 ```bash
 ├── .github
@@ -91,8 +103,6 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|docs|api-collections'`
 │   │   │   └── postgres_migrations.go    # Database migration handling with golang-migrate/v4
 │   │   ├── kafka
 │   │   │   └── sample.md                 # Placeholder for Kafka integration
-│   │   └── redis
-│   │       └── sample.md                  # Placeholder for Redis integration
 │   └── common
 │       ├── app_errs.go               # Custom error types
 │       ├── config.go                 # Configuration management
@@ -381,19 +391,38 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|docs|api-collections'`
 - **Success Response**: `200 OK`
   ```json
   {
-    "cards": [
-      {
-        "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "provider": "visa",
-        "type": "credit",
-        "lastFour": "1111",
-        "expiryDate": "12/25",
-        "status": "active",
-        "createdAt": "2024-10-07T06:18:54.980941Z",
-        "updatedAt": "2024-10-07T06:18:54.980941Z"
-      },
-      // ... more cards
-    ]
+      "cards": [
+          {
+              "uuid": "93289d24-1c46-4a05-b92c-2ce2284e6462",
+              "provider": "mastercard",
+              "type": "credit",
+              "lastFour": "4444",
+              "expiryDate": "11/26",
+              "status": "active",
+              "createdAt": "2024-10-10T06:04:31.807741+06:00",
+              "updatedAt": "2024-10-10T06:05:59.505754+06:00"
+          },
+          {
+              "uuid": "790dc5de-6d9f-44be-9edb-2579ab8bfb5a",
+              "provider": "amex",
+              "type": "credit",
+              "lastFour": "8431",
+              "expiryDate": "12/25",
+              "status": "active",
+              "createdAt": "2024-10-10T06:04:27.99682+06:00",
+              "updatedAt": "2024-10-10T06:04:27.99682+06:00"
+          },
+          {
+              "uuid": "77c9c9b9-4fe6-4d51-af7f-72ae5a181fc6",
+              "provider": "visa",
+              "type": "credit",
+              "lastFour": "1111",
+              "expiryDate": "12/25",
+              "status": "active",
+              "createdAt": "2024-10-10T06:04:20.158023+06:00",
+              "updatedAt": "2024-10-10T06:04:20.158023+06:00"
+          }
+      ]
   }
   ```
 - **Error Responses**:
