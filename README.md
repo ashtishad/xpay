@@ -28,10 +28,6 @@
 
 Refer to **Makefile** for more details on development commands. Example: `make migrate-create name=create-cards-table`
 
-Refer to **docs/guides** for development guides.
-
-<a href="#top">Back to Top</a>
-
 ## Tools/Libraries Used
 
 #### Used in the Core API
@@ -44,14 +40,11 @@ Refer to **docs/guides** for development guides.
 <details>
 <summary>Click to see development tools</summary>
 
-#### Development Tools
 - [swaggo/swag](https://github.com/swaggo/swag): Swagger API documentation.
 - [Air](https://github.com/cosmtrek/air): Live reloading. (config: .air.toml)
 - [golangci-lint](https://golangci-lint.run/): Linting (config: .golangci.yaml)
 
 </details>
-
-<a href="#top">Back to Top</a>
 
 ## Progress Tracking
 
@@ -62,15 +55,44 @@ Refer to **docs/guides** for development guides.
 | API Design & Architecture | • Domain Driven Design with clear bounded contexts<br>• RESTful API design<br>• Event streaming with Apache Kafka<br>• OpenAPI 3.0 specifications | ✅<br>✅<br>🔄<br>✅ |
 | Security | • ES256 JWT with asymmetric key pairs<br>• AES-256-GCM for card data encryption<br>• SQL injection prevention with parameterized queries<br>• DTO for controlled data to the client<br>• Route protection with Auth middleware<br>• Input and query param validation<br>• Rate limiting with Leaky Bucket algorithm | ✅<br>✅<br>✅<br>✅<br>✅<br>✅<br>🔄 |
 | Database | • ACID transactions with appropriate isolation levels<br>• Raw SQL for performance<br>• Connection pooling with pgx, exposing standard *sql.DB<br>• Optimized indexing and unique constraints<br>• Version-controlled schema changes with migrations | ✅<br>✅<br>✅<br>✅<br>✅ |
-| Core Operations & Observability | • Custom AppError interface for error handling<br>• Centralized configuration management with Viper<br>• Structured logging with slog<br>• Context timeout for preventing deadlocks and tracking performace <br>• Comprehensive test coverage<br>• Code quality with golangci-lint | ✅<br>✅<br>✅<br>✅<br>🔄<br>✅ |
+| Core Operations & Observability | • Custom AppError interface for error handling<br>• Centralized configuration management with Viper<br>• Structured logging with slog<br>• Context with timeout for each request <br>• Comprehensive test coverage<br>• Code quality with golangci-lint | ✅<br>✅<br>✅<br>✅<br>🔄<br>✅ |
 | Payment Gateways | • Idempotent payment processing<br>• Stripe integration<br>• PayPal integration<br>• Webhook handling for asynchronous events | 🔄<br>🔄<br>🔄<br>🔄 |
-| Deployment & Monitoring | • GitHub Actions CI pipeline<br>• AWS RDS with PostgreSQL<br>• ECS Fargate for serverless container deployment<br>• Prometheus metrics and Grafana dashboards<br>• Multi-stage Docker builds for minimal image size | ✅<br>🔄<br>🔄<br>🔄<br>✅ |
+| Deployment & Monitoring | • Multi-stage Docker builds for minimal image size <br>• GitHub Actions CI pipeline<br>• AWS RDS with PostgreSQL<br>• ECS Fargate for serverless container deployment<br>• Prometheus metrics and Grafana dashboards | ✅<br>✅<br>🔄<br>🔄<br>🔄 |
+
+<a href="#top">Back to Top</a>
+
+## Architecture and Request Flow:
+
+The project follows domain-driven design, loosely coupled clean architecture, suited for large codebase.
+
+```
+
+┌─────────┐    JSON    ┌───────────────┐   Domain   ┌─────────────┐
+│ Client  ├───────────►│   Handlers    ├───────────►│ Repositories│
+└─────────┘    (DTO)   └───────────────┘   Models   └─────────────┘
+                              │                           │
+                              │                           │
+                              │          Domain           │
+                              │          Models           │
+                              │                           │
+┌─────────┐    JSON    ┌───────────────┐   Domain   ┌─────────────┐
+│ Client   ◄───────────┤   Handlers     ◄───────────┤Repositories │
+└─────────┘    (DTO)   └───────────────┘   Models   └─────────────┘
+
+```
+Example: Create a wallet
+
+wallet.go (model) -> wallet_repository.go -> wallet_handlers.go (using DTOs)
+
+1. Domain Models: `internal/domain/*.go`
+2. Repositories: `internal/domain/*_repository.go`
+3. HTTP Handlers: `internal/server/handlers/*.go`
+4. DTOs: `internal/dto/*.go`
+5. Routes: `internal/server/routes/*.go`
 
 <a href="#top">Back to Top</a>
 
 ## Directory Structure
-
-The project follows domain-driven design, loosely coupled clean architecture, suited for large codebase.
 
 <details>
 <summary>Click to expand Directory Structure</summary>
@@ -148,6 +170,8 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 ├── config.yaml                       # Application configuration
 ├── main.go                           # Application entry point
 ├── Makefile                          # Development commands and shortcuts
+├── Dockerfile                        # Docker file with multi stage builds
+├── .dockerignore                     # Directories to ignore in the Docker builds
 ├── README.md                         # Project documentation
 ├── compose.yaml                      # Docker Compose configuration
 ├── go.mod                            # Go module definition
@@ -158,6 +182,31 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 </details>
 
 <a href="#top">Back to Top</a>
+
+## Development Guides
+
+For detailed information on various aspects of the project, refer to the following guides:
+
+<details>
+<summary>Click to expand Development Guides</summary>
+
+- [Configuration Management](https://github.com/ashtishad/xpay/blob/main/guides/config.md): Learn how to manage application configuration using Viper.
+
+- [Configuration and Key Management in Production](https://github.com/ashtishad/xpay/blob/main/guides/configuration_key_management_in_production.md): Best practices for managing configs and secrets in production environments.
+
+- [Dockerfile Guide](https://github.com/ashtishad/xpay/blob/main/guides/dockerfile.md): Instructions for building and running the XPay application in Docker.
+
+- [Generating Secrets](https://github.com/ashtishad/xpay/blob/main/guides/generating_secrets.md): Procedures for generating and managing cryptographic keys and secrets.
+
+- [GitHub Actions Test Workflow](https://github.com/ashtishad/xpay/blob/main/guides/github_actions_test_workflow.md): Understanding the CI/CD pipeline setup using GitHub Actions.
+
+- [Linter Configuration](https://github.com/ashtishad/xpay/blob/main/guides/linter_config.md): Explanation of golangci-lint setup and usage in the project.
+
+- [Makefile Commands](https://github.com/ashtishad/xpay/blob/main/guides/makefile.md): Comprehensive guide to all Make commands used in development and deployment.
+
+- [Zed/VSCode Shortcuts](https://github.com/ashtishad/xpay/blob/main/guides/zed_vscode_shortcuts.md): Helpful keyboard shortcuts for efficient coding in Zed or VSCode editors.
+
+</details>
 
 ## API Documentation
 
