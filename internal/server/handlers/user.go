@@ -39,10 +39,16 @@ func NewUserHandler(userRepo domain.UserRepository) *UserHandler {
 // @Router /users [post]
 func (h *UserHandler) CreateUserWithRole(c *gin.Context) {
 	requestID := c.GetString(common.ContextKeyRequestID)
-	authorizedUser, appErr := validateAdminAccess(c)
-	if appErr != nil {
-		slog.Error("failed to validate admin access", "requestID", requestID, "error", appErr.Error())
-		c.JSON(appErr.Code(), dto.ErrorResponse{Error: appErr.Error()})
+	authorizedUser, exists := c.Get(common.ContextKeyAuthorizedUser)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{Error: "User not authenticated"})
+		return
+	}
+
+	user, ok := authorizedUser.(*domain.User)
+	if !ok {
+		slog.Error("failed to cast authorized user")
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "Unexpected server error"})
 		return
 	}
 
@@ -53,9 +59,8 @@ func (h *UserHandler) CreateUserWithRole(c *gin.Context) {
 		return
 	}
 
-	// Only admins can create other admins
-	if req.Role == domain.UserRoleAdmin && authorizedUser.Role != domain.UserRoleAdmin {
-		c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "Only admins can create other admins"})
+	if !secure.CanCreateUser(user.Role, req.Role) {
+		c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "You don't have permission to create a user with this role"})
 		return
 	}
 
