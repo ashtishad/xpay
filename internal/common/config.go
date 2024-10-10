@@ -49,6 +49,10 @@ func LoadConfig() (*AppConfig, error) {
 	v.AddConfigPath(".")
 	v.AutomaticEnv()
 
+	if err := bindEnvVariables(v); err != nil {
+		return nil, fmt.Errorf("failed to bind overridden environment variables: %w", err)
+	}
+
 	if err := v.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
@@ -130,6 +134,37 @@ func validateConfig(config *AppConfig) error {
 
 	if len(missingConfigs) > 0 {
 		return fmt.Errorf("missing or invalid required configurations: %v", missingConfigs)
+	}
+
+	return nil
+}
+
+// bindEnvVariables maps environment variables to configuration keys.
+// This allows overriding config values using Docker environment variables.
+//
+// Docker example:
+//
+//	docker run -e DB_URL="postgres://user:pass@host:5432/db" -e APP_ENV="production" ...
+func bindEnvVariables(v *viper.Viper) error {
+	envMappings := map[string]string{
+		"app.env":               "APP_ENV",
+		"app.gin_mode":          "GIN_MODE",
+		"app.server_address":    "SERVER_ADDRESS",
+		"db.url":                "DB_URL",
+		"db.max_open_conns":     "DB_MAX_OPEN_CONNS",
+		"db.max_idle_conns":     "DB_MAX_IDLE_CONNS",
+		"db.conn_max_lifetime":  "DB_CONN_MAX_LIFETIME",
+		"db.conn_max_idle_time": "DB_CONN_MAX_IDLE_TIME",
+		"jwt.private_key":       "JWT_PRIVATE_KEY",
+		"jwt.public_key":        "JWT_PUBLIC_KEY",
+		"card.aes_key":          "CARD_AES_KEY",
+	}
+
+	for configKey, envVar := range envMappings {
+		err := v.BindEnv(configKey, envVar)
+		if err != nil {
+			return fmt.Errorf("failed to bind environment variable %s to %s: %w", envVar, configKey, err)
+		}
 	}
 
 	return nil

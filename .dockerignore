@@ -1,0 +1,16 @@
+*
+
+!main.go
+!config.yaml
+!go.mod
+!go.sum
+!Dockerfile
+
+!internal/
+!migrations/
+
+!infra/
+infra/docker/
+
+!docs/
+docs/guides
