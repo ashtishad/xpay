@@ -55,7 +55,7 @@ Refer to **Makefile** for more details on development commands. Example: `make m
 | Area | Features and Best Practices | Status |
 |------|------------------------------|--------|
 | API Design & Architecture | • Domain Driven Design, Clean Architecure <br>• RESTful API<br>• Event streaming with Apache Kafka<br>• OpenAPI 3.0 specifications | ✅<br>✅<br>🔄<br>✅ |
-| Security | • JWT-ES256 with ECDSA asymmetric key pairs<br>• AES-256-GCM for card data encryption<br>• SQL injection prevention with parameterized queries<br>• Role based access control (RBAC) <br>• DTO for controlled data to the client<br>• Input and query param validation<br>• Rate limiting with Leaky Bucket algorithm | ✅<br>✅<br>✅<br>✅<br>✅<br>✅<br>🔄 |
+| Security | • JWT-ES256 with ECDSA asymmetric key pairs<br>• AES-256-GCM for card data encryption<br>• SQL injection prevention with parameterized sql queries<br>• Role based access control (RBAC) <br>• DTO for controlled data to the client<br>• User input and query param validation<br>• IP-Based Rate limiting with Token Bucket algorithm | ✅<br>✅<br>✅<br>✅<br>✅<br>✅<br>✅ |
 | Database | • ACID transactions with appropriate isolation levels<br>• Raw SQL for performance<br>• Connection pooling with pgx, exposing standard *sql.DB<br>• Optimized indexing and unique constraints<br>• Version-controlled schema changes with migrations | ✅<br>✅<br>✅<br>✅<br>✅ |
 | Core Operations & Observability | • Custom AppError interface for error handling<br>• Centralized configuration management with Viper<br>• Structured logging with slog<br>• Context with timeout for each request <br>• Comprehensive test coverage<br>• Code quality with golangci-lint | ✅<br>✅<br>✅<br>✅<br>🔄<br>✅ |
 | Payment Gateways | • Idempotent payment processing<br>• Stripe integration<br>• PayPal integration<br>• Webhook handling for asynchronous events | 🔄<br>🔄<br>🔄<br>🔄 |
@@ -117,29 +117,34 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 │   ├── dto
 │   │   ├── auth.go                   # Authentication-related DTOs/REST API Request Response Structurers
 │   │   ├── card.go                   # Card-related DTOs
-│   │   ├── common.go                 # Shared DTO structures
+│   │   ├── shared.go                 # Shared DTO structures
+│   │   └── wallet.go                 # User-related DTOs
 │   │   └── wallet.go                 # Wallet-related DTOs
 │   ├── secure
 │   │   ├── card_aes.go               # Card AES-256 with GCM mode, Validate, Encrypt and Decrypt
 │   │   ├── jwt.go                    # JWT token handling, generate and validate tokens
+│   │   ├── rbac.go                   # Role based access control (RBAC) policies
 │   │   ├── password.go               # Password hashing and verification with bcrypt
 │   │   └── password_test.go          # Password utility tests
 │   ├── server
 │   │   ├── handlers
 │   │   │   ├── auth.go               # Login, Register handlers
-│   │   │   ├── auth.go               # Card http handlers
+│   │   │   ├── card.go               # Card http handlers
 │   │   │   ├── helpers.go            # Handlers helper functions
+│   │   │   └── user.go               # User HTTP handlers
 │   │   │   └── wallet.go             # Wallet HTTP handlers
 │   │   ├── middlewares
 │   │   │   ├── auth.go               # Auth middleware (Validate token, Set Authorized user in req context)
 │   │   │   ├── cors.go               # CORS middleware
 │   │   │   ├── gin_logger.go         # Custom Logging middleware for gin
 │   │   │   ├── middlewares.go        # Core Middleware setup
+│   │   │   └── rate_limiter.go       # IP-Based rate limiter with token bucket algorithm
 │   │   │   └── request_id.go         # Request ID middleware, sets X-Request-ID header
 │   │   ├── routes
 │   │   │   ├── auth.go               # Authentication routes
-│   │   │   ├── auth.go               # Card routes
+│   │   │   ├── card.go               # Card routes
 │   │   │   ├── routes.go             # Core routes setup
+│   │   │   └── user.go               # User  routes
 │   │   │   └── wallet.go             # Wallet routes
 │   │   └── server.go                  # HTTP server setup with gin
 │   ├── infra
@@ -150,14 +155,14 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 │   │   │   └── postgres_migrations.go    # Database migration handling with golang-migrate/v4
 │   │   ├── kafka
 │   │   │   └── sample.md                 # Placeholder for Kafka integration
-│   └── common
-│       ├── app_errs.go               # Custom error types
-│       ├── config.go                 # Configuration management
-│       ├── constants.go              # Global constants
-│       ├── context_keys.go           # Context key definitions
-│       ├── custom_err_messages.go    # Error message definitions
-│       ├── slog_config.go            # Structured logging configuration
-│       └── timeouts.go               # Timeout constants
+│   ├── common
+│   │   ├── app_errs.go               # Custom error types
+│   │   ├── config.go                 # Configuration management
+│   │   ├── constants.go              # Global constants
+│   │   ├── context_keys.go           # Context key definitions
+│   │   ├── custom_err_messages.go    # Error message definitions
+│   │   ├── slog_config.go            # Structured logging configuration
+│   │   ├── timeouts.go               # Context timeout constants
 ├── migrations
 │   ├── 000001_create_users_table.down.sql   # User table rollback
 │   ├── 000001_create_users_table.up.sql     # User table creation
