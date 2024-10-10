@@ -1,4 +1,12 @@
 # xPay: Digital Wallet
+<a name="top"></a>
+
+## Table of Contents
+- [Quick Start](#quick-start)
+- [Tools/Libraries Used](#toolslibraries-used)
+- [Progress Tracking](#progress-tracking)
+- [Project Structure](#project-structure)
+- [API Documentation](#api-documentation)
 
 ## Quick Start
 
@@ -19,7 +27,10 @@
 5. (Or) Run `make watch` to live reload the application with air.
 
 Refer to **Makefile** for more details on development commands. Example: `make migrate-create name=create-cards-table`
+
 Refer to **docs/guides** for development guides.
+
+<a href="#top">Back to Top</a>
 
 ## Tools/Libraries Used
 
@@ -30,10 +41,17 @@ Refer to **docs/guides** for development guides.
 - [golang-jwt](https://github.com/golang-jwt/jwt/): JSON Web Token handling.
 - [viper](https://github.com/spf13/viper): For configuration management. (config: config.yaml)
 
+<details>
+<summary>Click to see development tools</summary>
+
 #### Development Tools
 - [swaggo/swag](https://github.com/swaggo/swag): Swagger API documentation.
 - [Air](https://github.com/cosmtrek/air): Live reloading. (config: .air.toml)
 - [golangci-lint](https://golangci-lint.run/): Linting (config: .golangci.yaml)
+
+</details>
+
+<a href="#top">Back to Top</a>
 
 ## Progress Tracking
 
@@ -48,9 +66,14 @@ Refer to **docs/guides** for development guides.
 | Payment Gateways | • Idempotent payment processing<br>• Stripe integration<br>• PayPal integration<br>• Webhook handling for asynchronous events | 🔄<br>🔄<br>🔄<br>🔄 |
 | Deployment & Monitoring | • GitHub Actions CI pipeline<br>• AWS RDS with PostgreSQL<br>• ECS Fargate for serverless container deployment<br>• Prometheus metrics and Grafana dashboards<br>• Multi-stage Docker builds for minimal image size | ✅<br>🔄<br>🔄<br>🔄<br>✅ |
 
-## Project Structure
+<a href="#top">Back to Top</a>
+
+## Directory Structure
 
 The project follows domain-driven design, loosely coupled clean architecture, suited for large codebase.
+
+<details>
+<summary>Click to expand Directory Structure</summary>
 
 command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 
@@ -132,7 +155,14 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 └── .air.toml                         # Live reload configuration with air
 ```
 
+</details>
+
+<a href="#top">Back to Top</a>
+
 ## API Documentation
+
+<details>
+<summary>Click to expand API Documentation</summary>
 
 ### Authentication Endpoints
 
@@ -429,3 +459,7 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
   - `401 Unauthorized`: `{"error": "Authentication required"}`
   - `403 Forbidden`: `{"error": "You can only list cards from your own wallet"}`
   - `500 Internal Server Error`: `{"error": "An unexpected error occurred"}`
+
+</details>
+
+[Back to Top](#top)
