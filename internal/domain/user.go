@@ -28,3 +28,13 @@ type User struct {
 	CreatedAt    time.Time `json:"createdAt"`
 	UpdatedAt    time.Time `json:"updatedAt"`
 }
+
+// IsValidUserRole checks if the provided role is valid.
+func IsValidUserRole(role string) bool {
+	return role == UserRoleAdmin || role == UserRoleUser || role == UserRoleAgent || role == UserRoleMerchant
+}
+
+// IsValidUserStatus checks if the provided satus is valid.
+func IsValidUserStatus(status string) bool {
+	return status == UserStatusActive || status == UserStatusInactive || status == UserStatusDeleted
+}
