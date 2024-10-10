@@ -192,21 +192,14 @@ For detailed information on various aspects of the project, refer to the followi
 <details>
 <summary>Click to expand Wiki</summary>
 
-- [Configuration Management](https://github.com/ashtishad/xpay/blob/main/guides/config.md): Learn how to manage application configuration using Viper.
-
-- [Configuration and Key Management in Production](https://github.com/ashtishad/xpay/blob/main/guides/configuration_key_management_in_production.md): Best practices for managing configs and secrets in production environments.
-
-- [Dockerfile Guide](https://github.com/ashtishad/xpay/blob/main/guides/dockerfile.md): Instructions for building and running the XPay application in Docker.
-
-- [Generating Secrets](https://github.com/ashtishad/xpay/blob/main/guides/generating_secrets.md): Procedures for generating and managing cryptographic keys and secrets.
-
-- [GitHub Actions Test Workflow](https://github.com/ashtishad/xpay/blob/main/guides/github_actions_test_workflow.md): Understanding the CI/CD pipeline setup using GitHub Actions.
-
-- [Linter Configuration](https://github.com/ashtishad/xpay/blob/main/guides/linter_config.md): Explanation of golangci-lint setup and usage in the project.
-
-- [Makefile Commands](https://github.com/ashtishad/xpay/blob/main/guides/makefile.md): Comprehensive guide to all Make commands used in development and deployment.
-
-- [Zed/VSCode Shortcuts](https://github.com/ashtishad/xpay/blob/main/guides/zed_vscode_shortcuts.md): Helpful keyboard shortcuts for efficient coding in Zed or VSCode editors.
+- [Makefile Commands](https://github.com/ashtishad/xpay/blob/main/docs/wiki/makefile.md): Comprehensive guide to all Make commands used in development and deployment.
+- [Configuration Management](https://github.com/ashtishad/xpay/blob/main/docs/wiki/config.md): Learn how to manage application configuration using Viper.
+- [Dockerfile Guide](https://github.com/ashtishad/xpay/blob/main/docs/wiki/dockerfile.md): Instructions for building and running the XPay application in Docker.
+- [Generating Secrets](https://github.com/ashtishad/xpay/blob/main/docs/wiki/generating_secrets.md): Procedures for generating and managing cryptographic keys and secrets.
+- [GitHub Actions Test Workflow](https://github.com/ashtishad/xpay/blob/main/docs/wiki/github_actions_test_workflow.md): Understanding the CI/CD pipeline setup using GitHub Actions.
+- [Linter Configuration](https://github.com/ashtishad/xpay/blob/main/docs/wiki/linter_config.md): Explanation of golangci-lint setup and usage in the project.
+- [Configuration and Key Management in Production](https://github.com/ashtishad/xpay/blob/main/docs/wiki/configuration_key_management_in_production.md): Best practices for managing configs and secrets in production environments.
+- [Zed/VSCode Shortcuts](https://github.com/ashtishad/xpay/blob/main/docs/wiki/zed_vscode_shortcuts.md): Helpful keyboard shortcuts for efficient coding in Zed or VSCode editors.
 
 </details>
 
