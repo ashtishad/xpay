@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"github.com/ashtishad/xpay/internal/common"
@@ -39,14 +40,17 @@ func NewWalletHandler(walletRepo domain.WalletRepository, userRepo domain.UserRe
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /users/{user_uuid}/wallets [post]
 func (h *WalletHandler) CreateWallet(c *gin.Context) {
+	requestID := c.GetString(common.ContextKeyRequestID)
 	authorizedUser, appErr := validateUserAccess(c)
 	if appErr != nil {
+		slog.Error("failed to validate user access", "requestID", requestID, "error", appErr.Error())
 		c.JSON(appErr.Code(), dto.ErrorResponse{Error: appErr.Error()})
 		return
 	}
 
 	var req dto.CreateWalletRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		slog.Error("invalid request body", "requestID", requestID, "error", err.Error())
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: formatValidationError(err)})
 		return
 	}
@@ -58,6 +62,7 @@ func (h *WalletHandler) CreateWallet(c *gin.Context) {
 
 	createdWallet, appErr := h.walletRepo.Create(ctx, wallet)
 	if appErr != nil {
+		slog.Error("failed to create wallet", "requestID", requestID, "error", appErr.Error())
 		c.JSON(appErr.Code(), dto.ErrorResponse{Error: appErr.Error()})
 		return
 	}
@@ -80,19 +85,28 @@ func (h *WalletHandler) CreateWallet(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /users/{user_uuid}/wallets/{wallet_uuid}/balance [get]
 func (h *WalletHandler) GetWalletBalance(c *gin.Context) {
+	requestID := c.GetString(common.ContextKeyRequestID)
 	_, appErr := validateUserAccess(c)
 	if appErr != nil {
+		slog.Error("failed to validate user access", "requestID", requestID, "error", appErr.Error())
 		c.JSON(appErr.Code(), dto.ErrorResponse{Error: appErr.Error()})
 		return
 	}
 
 	walletUUID := c.Param("wallet_uuid")
+	if walletUUID == "" {
+		appErr := common.NewBadRequestError("Wallet UUID is required")
+		slog.Error("missing wallet UUID", "requestID", requestID)
+		c.JSON(appErr.Code(), dto.ErrorResponse{Error: appErr.Error()})
+		return
+	}
 
 	ctx, cancel := context.WithTimeout(c.Request.Context(), common.Timeouts.Wallet.Read)
 	defer cancel()
 
 	balance, appErr := h.walletRepo.GetBalance(ctx, walletUUID)
 	if appErr != nil {
+		slog.Error("failed to get wallet balance", "requestID", requestID, "error", appErr.Error())
 		c.JSON(appErr.Code(), dto.ErrorResponse{Error: appErr.Error()})
 		return
 	}
@@ -121,16 +135,25 @@ func (h *WalletHandler) GetWalletBalance(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /users/{user_uuid}/wallets/{wallet_uuid}/status [patch]
 func (h *WalletHandler) UpdateWalletStatus(c *gin.Context) {
+	requestID := c.GetString(common.ContextKeyRequestID)
 	_, appErr := validateUserAccess(c)
 	if appErr != nil {
+		slog.Error("failed to validate user access", "requestID", requestID, "error", appErr.Error())
 		c.JSON(appErr.Code(), dto.ErrorResponse{Error: appErr.Error()})
 		return
 	}
 
 	walletUUID := c.Param("wallet_uuid")
+	if walletUUID == "" {
+		appErr := common.NewBadRequestError("Wallet UUID is required")
+		slog.Error("missing wallet UUID", "requestID", requestID)
+		c.JSON(appErr.Code(), dto.ErrorResponse{Error: appErr.Error()})
+		return
+	}
 
 	var req dto.UpdateWalletStatusRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		slog.Error("invalid request body", "requestID", requestID, "error", err.Error())
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: formatValidationError(err)})
 		return
 	}
@@ -140,6 +163,7 @@ func (h *WalletHandler) UpdateWalletStatus(c *gin.Context) {
 
 	appErr = h.walletRepo.UpdateStatus(ctx, walletUUID, req.Status)
 	if appErr != nil {
+		slog.Error("failed to update wallet status", "requestID", requestID, "error", appErr.Error())
 		c.JSON(appErr.Code(), dto.ErrorResponse{Error: appErr.Error()})
 		return
 	}
