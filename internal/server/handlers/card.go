@@ -292,11 +292,11 @@ func (h *CardHandler) ListCards(c *gin.Context) {
 		WalletID: &walletID,
 	}
 
-	if provider := c.Query("provider"); provider != "" {
+	if provider := c.Query("provider"); provider != "" && domain.IsValidCardProvider(provider) {
 		filters.Provider = &provider
 	}
 
-	if status := c.Query("status"); status != "" {
+	if status := c.Query("status"); status != "" && domain.IsValidCardStatus(status) {
 		filters.Status = &status
 	}
 
