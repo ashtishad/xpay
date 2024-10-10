@@ -6,6 +6,7 @@ import (
 	"github.com/ashtishad/xpay/internal/common"
 	"github.com/ashtishad/xpay/internal/domain"
 	"github.com/ashtishad/xpay/internal/secure"
+	"github.com/ashtishad/xpay/internal/server/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,8 +15,15 @@ func InitRoutes(rg *gin.RouterGroup, db *sql.DB, config *common.AppConfig, jm *s
 	walletRepo := domain.NewWalletRepository(db)
 	cardRepo := domain.NewCardRepository(db)
 
+	// Register public routes
 	registerAuthRoutes(rg, userRepo, jm)
-	registerUserManagementRoutes(rg, userRepo, jm.GetPublicKey())
-	registerWalletRoutes(rg, walletRepo, userRepo, jm.GetPublicKey())
-	registerCardRoutes(rg, cardRepo, walletRepo, userRepo, jm.GetPublicKey(), cardEncryptor)
+
+	// Create authenticated user gin router group
+	authGroup := rg.Group("/users")
+	authGroup.Use(middlewares.AuthMiddleware(userRepo, jm.GetPublicKey()))
+
+	// Register authenticated routes
+	registerUserManagementRoutes(authGroup, userRepo)
+	registerWalletRoutes(authGroup, walletRepo, userRepo)
+	registerCardRoutes(authGroup, cardRepo, walletRepo, cardEncryptor)
 }
