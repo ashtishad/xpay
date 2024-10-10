@@ -12,6 +12,7 @@ require (
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/spf13/viper v1.19.0
 	golang.org/x/crypto v0.27.0
+	golang.org/x/time v0.5.0
 )
 
 require (
