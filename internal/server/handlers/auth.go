@@ -32,11 +32,11 @@ func NewAuthHandler(userRepo domain.UserRepository, jm *secure.JWTManager) *Auth
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param input body RegisterUserRequest true "User registration details"
-// @Success 201 {object} RegisterUserResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 409 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
+// @Param input body dto.RegisterUserRequest true "User registration details"
+// @Success 201 {object} dto.RegisterUserResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 409 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	requestID := c.GetString(common.ContextKeyRequestID)
@@ -86,12 +86,12 @@ func (h *AuthHandler) Register(c *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param input body LoginRequest true "User login credentials"
-// @Success 200 {object} LoginResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 401 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
+// @Param input body dto.LoginRequest true "User login credentials"
+// @Success 200 {object} dto.LoginResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	requestID := c.GetString(common.ContextKeyRequestID)

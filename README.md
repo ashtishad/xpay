@@ -54,7 +54,7 @@ Refer to **Makefile** for more details on development commands. Example: `make m
 
 | Area | Features and Best Practices | Status |
 |------|------------------------------|--------|
-| API Design & Architecture | • Domain Driven Design, Clean Architecure <br>• RESTful API<br>• Event streaming with Apache Kafka<br>• OpenAPI 3.0 specifications | ✅<br>✅<br>🔄<br>✅ |
+| API Design & Architecture | • Domain Driven Design, Clean Architecure <br>• RESTful API<br>• Event streaming with Apache Kafka<br>• OpenAPI 2.0 specifications | ✅<br>✅<br>🔄<br>✅ |
 | Security | • JWT-ES256 with ECDSA asymmetric key pairs<br>• AES-256-GCM for card data encryption<br>• SQL injection prevention with parameterized sql queries<br>• Role based access control (RBAC) <br>• DTO for controlled data to the client<br>• User input and query param validation<br>• IP-Based Rate limiting with Token Bucket algorithm | ✅<br>✅<br>✅<br>✅<br>✅<br>✅<br>✅ |
 | Database | • ACID transactions with appropriate isolation levels<br>• Raw SQL for performance<br>• Connection pooling with pgx, exposing standard *sql.DB<br>• Optimized indexing and unique constraints<br>• Version-controlled schema changes with migrations | ✅<br>✅<br>✅<br>✅<br>✅ |
 | Core Operations & Observability | • Custom AppError interface for error handling<br>• Centralized configuration management with Viper<br>• Structured logging with slog<br>• Context with timeout for each request <br>• Comprehensive test coverage<br>• Code quality with golangci-lint | ✅<br>✅<br>✅<br>✅<br>🔄<br>✅ |

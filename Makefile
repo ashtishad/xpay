@@ -24,6 +24,11 @@ setup-hooks:
 	@chmod +x .git/hooks/pre-push
 	@echo "Git hooks set up successfully"
 
+swagger:
+	@which swag > /dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
+	@echo "Generating Swagger documentation..."
+	@swag init
+
 # Docker compose commands
 up:
 	@docker compose up -d
@@ -66,4 +71,4 @@ docker-stop:
 docker-rerun: docker-stop docker-build docker-run
 
 .PHONY: run watch test lint up down down-data docker-build docker-run docker-stop docker-rerun \
-        migrate-up migrate-down migrate-create check_and_install_migrate setup-hooks
+        migrate-up migrate-down migrate-create check_and_install_migrate setup-hooks swagger
