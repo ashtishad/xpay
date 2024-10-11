@@ -6,6 +6,7 @@ This guide explains the Makefile commands used in the XPay project, their purpos
 1. [Environment Variables](#environment-variables)
 2. [Application Commands](#application-commands)
 3. [Setup Git Hooks](#setup-git-hooks)
+4. [Generate Swagger Specifications](#generate-swagger-specifications)
 4. [Docker Compose Commands](#docker-compose-commands)
 5. [Database Commands](#database-commands)
 6. [Docker Application Commands](#docker-application-commands)
@@ -69,6 +70,17 @@ setup-hooks:
 ```
 **Purpose**: Sets up Git hooks, specifically the pre-push hook.
 **Usage**: `make setup-hooks`
+
+## Generate Swagger Specifications
+```makefile
+swagger:
+	@which swag > /dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
+	@echo "Generating Swagger documentation..."
+	@swag init
+```
+**Purpose**: Generates Swagger documentation for the API.
+**Usage**: `make swagger`
+**Note**: Automatically installs the `swag` tool if not present.
 
 ## Docker Compose Commands
 
