@@ -5,15 +5,19 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 
+	"github.com/ashtishad/xpay/docs"
 	"github.com/ashtishad/xpay/internal/common"
 	"github.com/ashtishad/xpay/internal/infra/postgres"
 	"github.com/ashtishad/xpay/internal/secure"
 	"github.com/ashtishad/xpay/internal/server/middlewares"
 	"github.com/ashtishad/xpay/internal/server/routes"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // Server encapsulates all dependencies and configurations for the HTTP server.
@@ -67,7 +71,7 @@ func NewServer(ctx context.Context) (*Server, error) {
 	s.setupMiddlewares()
 	s.setupRoutes(jwtManager, cardEncryptor)
 
-	slog.Info(fmt.Sprintf("Swagger Specs available at %s/swagger/index.html", s.httpServer.Addr))
+	setSwaggerInfo(s.httpServer.Addr, cfg.App.Env)
 
 	return s, nil
 }
@@ -75,7 +79,7 @@ func NewServer(ctx context.Context) (*Server, error) {
 // setupSlogger configures the global logger based on the application environment.
 // It uses a text handler for development and a JSON handler for other environments.
 func setupSlogger(appSettings common.AppSettings) {
-	var logLevel = new(slog.LevelVar) // Info by default
+	var logLevel = new(slog.LevelVar)
 	var handler slog.Handler
 
 	if appSettings.Env == common.AppEnvDev {
@@ -124,6 +128,8 @@ func (s *Server) setupMiddlewares() {
 
 // setupRoutes initializes all API routes for the server.
 func (s *Server) setupRoutes(jm *secure.JWTManager, cardEncryptor *secure.CardEncryptor) {
+	s.Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	apiGroup := s.Router.Group("/api/v1")
 	routes.InitRoutes(apiGroup, s.DB, s.Config, jm, cardEncryptor)
 }
@@ -145,4 +151,28 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// setSwaggerInfo configures Swagger documentation settings for the API.
+// It sets the host based on the provided address and adjusts for local development if needed.
+func setSwaggerInfo(addr string, appEnv string) {
+	docs.SwaggerInfo.Title = "xPay Digital Wallet API"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.Host = addr
+
+	if appEnv == common.AppEnvDev {
+		host, port, err := net.SplitHostPort(addr)
+		if err != nil {
+			slog.Error("failed to split host and port", "error", err)
+			return
+		}
+
+		if host == "" {
+			docs.SwaggerInfo.Host = net.JoinHostPort("localhost", port)
+		}
+	}
+
+	slog.Info(fmt.Sprintf("Swagger Specs available at http://%s/swagger/index.html", docs.SwaggerInfo.Host))
 }
