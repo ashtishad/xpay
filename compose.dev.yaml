@@ -9,4 +9,4 @@ services:
 
 volumes:
   pg_data:
-    name: xpay_pg_data_dev
+    name: xpay_pg_data
