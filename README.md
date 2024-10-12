@@ -1,4 +1,4 @@
-# xPay: Digital Wallet
+## xPay: Digital Wallet
 <a name="top"></a>
 
 <p align="left">
