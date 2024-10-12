@@ -2,140 +2,162 @@
 
 ## 1. Base Image Selection
 
-**How**: Use specific version tags for base images.
+Use specific version tags for base images. Provides a consistent and reproducible Go development environment.
 ```dockerfile
 FROM golang:1.23.2-alpine3.20 AS builder
 ```
+**Why**: Ensures all builds use the same Go version and Alpine Linux base, preventing inconsistencies across different build environments.
 
-**Why**: Ensures reproducibility and prevents unexpected changes from image updates.
-
-**Best Practice**:
-- Use slim or alpine variants for smaller image sizes.
-- For production, consider distroless images for enhanced security.
+**Best Practices**:
+- Use specific version tags to ensure reproducibility.
+- Prefer Alpine-based images for smaller footprints.
+- Regularly update base images to include security patches.
 
 [Reference: Docker Official Images](https://docs.docker.com/develop/develop-images/baseimages/)
 
 ## 2. Working Directory
 
-**How**: Set a working directory for your application.
+Set a working directory for your application. Establishes a dedicated workspace for the build process.
 ```dockerfile
-WORKDIR /app
+WORKDIR /build
 ```
+**Why**: Isolates build artifacts and prevents conflicts with system files.
 
-**Why**: Organizes files within the container and sets the context for subsequent commands.
-
-**Best Practice**: Use a descriptive directory name relevant to your application.
+**Best Practices**:
+- Use meaningful directory names.
+- Avoid using the root directory as the working directory.
+- Be consistent with working directory paths across build stages.
 
 [Reference: WORKDIR Instruction](https://docs.docker.com/engine/reference/builder/#workdir)
 
 ## 3. Dependency Management
 
-**How**: Copy dependency files and install dependencies.
+Copy dependency files and install dependencies. Efficiently manages and verifies Go dependencies.
 ```dockerfile
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 ```
+**Why**: Ensures all required dependencies are available and verified before building, leveraging Docker's layer caching for faster subsequent builds.
 
-**Why**: Leverages Docker's layer caching for faster builds when dependencies don't change.
-
-**Best Practice**: Verify downloaded modules for integrity.
+**Best Practices**:
+- Separate dependency installation from application code copying.
+- Use `go mod verify` to ensure dependency integrity.
+- Consider using a dependency caching mechanism for faster builds.
 
 [Reference: Go Modules](https://go.dev/ref/mod#go-mod-verify)
 
 ## 4. Code Copy and Build
 
-**How**: Copy application code and build the binary.
+Copy application code and build the binary. Compiles the Go application into a lightweight, statically-linked binary.
 ```dockerfile
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o xm main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main main.go
 ```
+**Why**: Produces a self-contained executable optimized for size and compatibility with Alpine Linux.
 
-**Why**: Builds a statically-linked binary optimized for size.
-
-**Best Practice**: Use build flags to reduce binary size and disable CGO for better portability.
+**Best Practices**:
+- Use build flags to optimize binary size.
+- Disable CGO for better portability.
+- Consider using multi-stage builds to keep the final image small.
 
 [Reference: Go Build Flags](https://golang.org/cmd/go/#hdr-Compile_packages_and_dependencies)
 
 ## 5. Multi-stage Build
 
-**How**: Use the same Alpine version as the build stage for the final image.
+Use the same Alpine version as the build stage for the final image. Creates a minimal runtime environment for the application.
 ```dockerfile
 FROM alpine:3.20
 ```
+**Why**: Significantly reduces the final image size by excluding build tools and intermediate files.
 
-**Why**: Reduces the final image size by excluding build tools and intermediate files.
-
-**Best Practice**: Use the smallest possible base image that supports your application.
+**Best Practices**:
+- Use the smallest possible base image that supports your application.
+- Consider using `scratch` for Go binaries if no additional runtime dependencies are needed.
+- Keep the number of layers minimal in the final stage.
 
 [Reference: Multi-stage Builds](https://docs.docker.com/develop/develop-images/multistage-build/)
 
 ## 6. Non-root User
 
-**How**: Create and switch to a non-root user.
+Create and switch to a non-root user. Enhances container security by running the application as a non-privileged user.
 ```dockerfile
 RUN adduser -D ash
 USER ash
 WORKDIR /home/ash
 ```
+**Why**: Limits the potential impact of security vulnerabilities by restricting the application's permissions.
 
-**Why**: Enhances security by limiting potential damage from container breakouts.
-
-**Best Practice**: Always run containers as non-root users in production.
+**Best Practices**:
+- Always run applications as non-root users.
+- Use the `--no-create-home` flag when it's not needed.
+- Set appropriate file permissions for application files.
 
 [Reference: Docker Security](https://docs.docker.com/engine/security/security/#linux-kernel-capabilities)
 
 ## 7. File Copying and Permissions
 
-**How**: Copy built artifacts and set proper ownership.
+Copy built artifacts and set proper ownership. Transfers the compiled application and necessary files to the runtime environment with appropriate ownership.
 ```dockerfile
-COPY --chown=ash:ash --from=builder /app/ .
-COPY --chown=ash:ash --from=builder /app/migrations ./migrations
-COPY --chown=ash:ash --from=builder /app/config.yaml .
+COPY --chown=ash:ash --from=builder /build .
+COPY --chown=ash:ash --from=builder /build/migrations ./migrations
+COPY --chown=ash:ash --from=builder /build/config.yaml .
 ```
+**Why**: Ensures the application has the correct files and permissions to run properly as the non-root user.
 
-**Why**: Ensures the application files are owned by the non-root user.
-
-**Best Practice**: Always set appropriate file permissions and ownership.
+**Best Practices**:
+- Use `--chown` to set proper ownership in one step.
+- Copy only necessary files to the final image.
+- Use `.dockerignore` to exclude unnecessary files from the build context.
 
 [Reference: COPY Instruction](https://docs.docker.com/engine/reference/builder/#copy)
 
 ## 8. Expose Ports
 
-**How**: Declare the ports your application uses.
+Declare the ports your application uses. Specifies the network interfaces on which the application will listen.
 ```dockerfile
 EXPOSE 8080
 ```
+**Why**: Provides metadata about the application's networking requirements, facilitating proper container networking setup.
 
-**Why**: Documents the ports the application uses, improving clarity for operators.
-
-**Best Practice**: Only expose necessary ports.
+**Best Practices**:
+- Only expose necessary ports.
+- Use specific port numbers rather than ranges.
+- Document exposed ports in application documentation.
 
 [Reference: EXPOSE Instruction](https://docs.docker.com/engine/reference/builder/#expose)
 
 ## 9. Entrypoint and CMD
 
-**How**: Set the entrypoint for your application.
+Set the entrypoint for your application. Specifies how to run the application when the container starts.
 ```dockerfile
-ENTRYPOINT ["/home/ash/xm"]
+ENTRYPOINT ["/home/ash/main"]
 CMD []
 ```
+**Why**: Defines the primary command to execute the application, allowing for additional runtime arguments if needed.
 
-**Why**: Defines how your container will run as an executable.
-
-**Best Practice**: Use ENTRYPOINT for the main command and CMD for default arguments.
+**Best Practices**:
+- Use `ENTRYPOINT` for the main command and `CMD` for default arguments.
+- Prefer exec form (`[]`) over shell form for `ENTRYPOINT` and `CMD`.
+- Provide a way to override the entrypoint for debugging purposes.
 
 [Reference: ENTRYPOINT](https://docs.docker.com/engine/reference/builder/#entrypoint)
 
 ## Production vs Staging Considerations
 
 - **Production**:
-  - Use minimal, security-hardened base images.
-  - Implement strict security measures (non-root users, read-only filesystems).
-  - Optimize for performance and minimal attack surface.
+  - Optimize for security, performance, and minimal attack surface.
+  - Implementation: Use minimal base images, implement security measures, and optimize configurations.
+  - Best Practices:
+    - Implement health checks.
+    - Use read-only file systems where possible.
+    - Implement proper logging and monitoring.
 
 - **Staging**:
-  - Can use larger images with debugging tools if needed.
-  - May include additional monitoring or logging tools.
-  - Should mirror production as closely as possible for accurate testing.
+  - Mirror production environment while allowing for debugging and monitoring.
+  - Implementation: Include additional tools for diagnostics while maintaining similarity to production setup.
+  - Best Practices:
+    - Use the same base image as production.
+    - Include debugging tools without adding them to the production image.
+    - Implement feature flags for easier testing.
 
 [Reference: Docker Production Best Practices](https://docs.docker.com/develop/dev-best-practices/)
