@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
-	"net"
 	"net/http"
 	"os"
 
@@ -71,7 +70,7 @@ func NewServer(ctx context.Context) (*Server, error) {
 	s.setupMiddlewares()
 	s.setupRoutes(jwtManager, cardEncryptor)
 
-	setSwaggerInfo(s.httpServer.Addr, cfg.App.Env)
+	setSwaggerInfo(s.httpServer.Addr)
 
 	return s, nil
 }
@@ -154,25 +153,12 @@ func (s *Server) Shutdown(ctx context.Context) error {
 }
 
 // setSwaggerInfo configures Swagger documentation settings for the API.
-// It sets the host based on the provided address and adjusts for local development if needed.
-func setSwaggerInfo(addr string, appEnv string) {
+func setSwaggerInfo(addr string) {
 	docs.SwaggerInfo.Title = "xPay Digital Wallet API"
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Host = addr
-
-	if appEnv == common.AppEnvDev {
-		host, port, err := net.SplitHostPort(addr)
-		if err != nil {
-			slog.Error("failed to split host and port", "error", err)
-			return
-		}
-
-		if host == "" {
-			docs.SwaggerInfo.Host = net.JoinHostPort("localhost", port)
-		}
-	}
 
 	slog.Info(fmt.Sprintf("Swagger Specs available at http://%s/swagger/index.html", docs.SwaggerInfo.Host))
 }
