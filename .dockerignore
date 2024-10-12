@@ -10,7 +10,6 @@
 !migrations/
 
 !infra/
-infra/docker/
 
 !docs/
 docs/wiki
