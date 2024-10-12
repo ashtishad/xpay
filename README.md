@@ -1,6 +1,12 @@
 # xPay: Digital Wallet
 <a name="top"></a>
 
+<p align="left">
+  <a href="https://www.linkedin.com/in/ashef/">
+    <img src="https://skillicons.dev/icons?i=go,docker,kubernetes,postgresql,aws,kafka&theme=light" alt="Skills" />
+  </a>
+</p>
+
 ## Table of Contents
 - [Quick Start](#quick-start)
 - [Tools/Libraries Used](#toolslibraries-used)
