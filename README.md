@@ -12,31 +12,38 @@
 
 ## Quick Start
 
-1. Clone the repository:
+1. Clone and set up configuration:
    ```
    git clone git@github.com:ashtishad/xpay.git && cd xpay
-   ```
-
-2. Set up configuration:
-   ```
    cp local-dev/config.yaml.example config.yaml
    ```
 
-3. Start the application:
-   - With live reloading: `make watch`
-   - Without live reloading: `make up`
+2. Run and stop options:
 
-4. Stop the application:
-   - Stop containers: `make down`
-   - Stop and remove data: `make down-data`
+   A. Standard mode:
+   ```
+   make up            # Start
+   make down          # Stop
+   make down-data     # Stop and remove data
+   ```
 
-5. Development commands:
-   - Run tests: `make test`
-   - Run linter: `make lint`
-   - Generate Swagger docs: `make swagger`
-   - Create a migration: `make migrate-create name=your_migration_name`
+   B. Live reload mode: (Dockefile.dev and compose.dev.yaml are required)
+   ```
+   make watch            # Start with live reload
+   make watch-down       # Stop
+   make watch-down-data  # Stop and remove data
+   ```
 
-**Refer to the `Makefile` for additional commands and details.**
+3. Development commands (local):
+   ```
+   make test     # Run tests
+   make lint     # Run linter
+   make swagger  # Generate Swagger docs
+   make migrate-create name=your_migration_name  # Create a migration
+   ```
+
+**For more details, refer to the `Makefile`**.
+
 
 ## Tools/Libraries Used
 

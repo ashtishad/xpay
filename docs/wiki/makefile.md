@@ -4,10 +4,11 @@ This guide explains the Makefile commands used in the XPay project, their purpos
 
 ## Table of Contents
 1. [Environment Variables](#environment-variables)
-2. [Docker Compose Commands](#docker-compose-commands)
-3. [Development Tools](#development-tools)
-4. [Git Hooks](#git-hooks)
-5. [Database Migration Commands](#database-migration-commands)
+2. [Standard Mode Commands](#standard-mode-commands)
+3. [Live Reload Mode Commands](#live-reload-mode-commands)
+4. [Development Tools](#development-tools)
+5. [Git Hooks](#git-hooks)
+6. [Database Migration Commands](#database-migration-commands)
 
 ## Environment Variables
 
@@ -17,15 +18,33 @@ DB_URL=postgres://ash:samplepass@localhost:5432/xpay?sslmode=disable
 
 This variable sets the database connection string for local development. It's used in database migration commands.
 
-## Docker Compose Commands
+## Standard Mode Commands
 
-### Start Application (Without Live Reload)
+### Start Application
 ```makefile
 up:
 	@docker compose up --build
 ```
-**Purpose**: Starts all services defined in docker-compose.yaml, building images if necessary.
+**Purpose**: Starts all services defined in compose.yaml, building images if necessary.
 **Usage**: `make up`
+
+### Stop Application
+```makefile
+down:
+	@docker compose down
+```
+**Purpose**: Stops all running docker compose services.
+**Usage**: `make down`
+
+### Stop and Remove Data
+```makefile
+down-data:
+	@docker compose down -v --remove-orphans
+```
+**Purpose**: Stops services, removes containers, networks, volumes, and orphan containers.
+**Usage**: `make down-data`
+
+## Live Reload Mode Commands
 
 ### Start Application with Live Reload
 ```makefile
@@ -35,21 +54,21 @@ watch:
 **Purpose**: Starts the application with live reloading for development.
 **Usage**: `make watch`
 
-### Stop Docker Compose Services
+### Stop Live Reload Application
 ```makefile
-down:
-	@docker compose down
+watch-down:
+	@docker compose -f compose.yaml -f compose.dev.yaml down
 ```
-**Purpose**: Stops all running docker-compose services.
-**Usage**: `make down`
+**Purpose**: Stops all running docker compose services in live reload mode.
+**Usage**: `make watch-down`
 
-### Stop and Remove Docker Compose Services and Volumes
+### Stop and Remove Data (Live Reload Mode)
 ```makefile
-down-data:
-	@docker compose down -v --remove-orphans
+watch-down-data:
+	@docker compose -f compose.yaml -f compose.dev.yaml down -v --remove-orphans
 ```
-**Purpose**: Stops services, removes containers, networks, volumes, and orphan containers.
-**Usage**: `make down-data`
+**Purpose**: Stops services, removes containers, networks, volumes, and orphan containers in live reload mode.
+**Usage**: `make watch-down-data`
 
 ## Development Tools
 
@@ -129,7 +148,7 @@ migrate-create: check_and_install_migrate
 ## Best Practices
 
 1. Use `make watch` during development for live reloading.
-2. Use `make up` for running the application without live reloading.
+2. Use `make up` for running the application in standard mode.
 3. Always run `make test` and `make lint` before committing changes.
 4. Run `make migrate-up` after pulling new changes to keep your database schema up-to-date.
 5. Use `make swagger` to update API documentation when endpoints change.
