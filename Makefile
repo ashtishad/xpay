@@ -1,8 +1,8 @@
 DB_URL=postgres://ash:samplepass@localhost:5432/xpay?sslmode=disable
 
-# Standard mode
+# Application commands with Docker Compose
 up:
-	@docker compose up --build
+	@docker compose up
 
 down:
 	@docker compose down
@@ -10,17 +10,7 @@ down:
 down-data:
 	@docker compose down -v --remove-orphans
 
-# Live reload mode
-watch:
-	@docker compose -f compose.yaml -f compose.dev.yaml up --build
-
-watch-down:
-	@docker compose -f compose.yaml -f compose.dev.yaml down
-
-watch-down-data:
-	@docker compose -f compose.yaml -f compose.dev.yaml down -v --remove-orphans
-
-# Development Tools (Run locally)
+# Development Tools
 test:
 	@go test -v -cover -short ./...
 
@@ -51,5 +41,6 @@ migrate-down: check_and_install_migrate
 migrate-create: check_and_install_migrate
 	@migrate create -ext sql -dir migrations -seq $(name)
 
-.PHONY: up down down-data watch watch-down watch-down-data test lint swagger setup-hooks \
+# Declare PHONY targets
+.PHONY: up down down-data test lint swagger setup-hooks \
         migrate-up migrate-down migrate-create check_and_install_migrate

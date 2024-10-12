@@ -18,47 +18,33 @@
    cp local-dev/config.yaml.example config.yaml
    ```
 
-2. Run and stop options:
-
-   A. Standard mode:
+2. Run and manage the application:
    ```
-   make up            # Start
-   make down          # Stop
+   make up            # Start the application
+   make down          # Stop the application
    make down-data     # Stop and remove data
    ```
 
-   B. Live reload mode: (Dockefile.dev and compose.dev.yaml are required)
+3. Development commands (run locally):
    ```
-   make watch            # Start with live reload
-   make watch-down       # Stop
-   make watch-down-data  # Stop and remove data
-   ```
-
-3. Development commands (local):
-   ```
-   make test     # Run tests
-   make lint     # Run linter
-   make swagger  # Generate Swagger docs
+   make test          # Run tests
+   make lint          # Run linter
+   make swagger       # Generate Swagger docs
    make migrate-create name=your_migration_name  # Create a migration
    ```
 
-**For more details, refer to the `Makefile`**.
+**For more details on available commands, refer to the `Makefile`**
 
 
 ## Tools/Libraries Used
 
 #### Used in the Core API
-- [Gin](https://github.com/gin-gonic/gin): HTTP routing and middleware.
+- [Gin](https://github.com/gin-gonic/gin): HTTP routing, middleware and cors.
 - [pgx](https://github.com/jackc/pgx): Database driver and connection pooling, using standard *sql.DB handle.
 - [golang-migrate](https://github.com/golang-migrate/migrate): Database migrations.
 - [golang-jwt](https://github.com/golang-jwt/jwt/): JSON Web Token handling.
 - [viper](https://github.com/spf13/viper): For configuration management. (config: config.yaml)
-
-<details>
-<summary>Click to see development tools</summary>
-
-- [swaggo/swag](https://github.com/swaggo/swag): Swagger API documentation.
-- [Air](https://github.com/cosmtrek/air): Live reloading. (config: .air.toml)
+- [swaggo/swag](https://github.com/swaggo/swag): Swagger API documentation (usage: make swagger).
 - [golangci-lint](https://golangci-lint.run/): Linting (config: .golangci.yaml)
 
 </details>
@@ -191,11 +177,9 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 ├── main.go                           # Application entry point
 ├── Makefile                          # Development commands and shortcuts
 ├── Dockerfile                        # Docker file with multi stage builds
-├── Dockerfile.dev                    # Docker file for dev env, air live reload inside docker container.
 ├── .dockerignore                     # Directories to ignore in the Docker builds
 ├── README.md                         # Project documentation
 ├── compose.yaml                      # Docker Compose configuration
-├── compose.dev.yaml                  # Docker Compose configuration for dev env.
 ├── go.mod                            # Go module definition
 ├── go.sum                            # Go module checksums
 └── .air.toml                         # Live reload configuration with air
