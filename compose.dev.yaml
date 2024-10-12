@@ -1,0 +1,14 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
+    command: air
+    environment:
+      GIN_MODE: debug
+
+volumes:
+  pg_data:
+    name: xpay_pg_data_dev

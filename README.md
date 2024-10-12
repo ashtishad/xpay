@@ -12,23 +12,31 @@
 
 ## Quick Start
 
-1. Clone your new repository locally with ssh:
+1. Clone the repository:
    ```
-   git clone git@github.com:ashtishad/xpay.git
+   git clone git@github.com:ashtishad/xpay.git && cd xpay
    ```
 
-2. Copy `config.yaml.example` from the `/local-dev` directory to the project root as `config.yaml`:
+2. Set up configuration:
    ```
    cp local-dev/config.yaml.example config.yaml
    ```
 
-3. Run `make up` to start the Docker services in the background.
+3. Start the application:
+   - With live reloading: `make watch`
+   - Without live reloading: `make up`
 
-4. Run `make run` to start the application.
+4. Stop the application:
+   - Stop containers: `make down`
+   - Stop and remove data: `make down-data`
 
-5. (Or) Run `make watch` to live reload the application with air.
+5. Development commands:
+   - Run tests: `make test`
+   - Run linter: `make lint`
+   - Generate Swagger docs: `make swagger`
+   - Create a migration: `make migrate-create name=your_migration_name`
 
-Refer to **Makefile** for more details on development commands. Example: `make migrate-create name=create-cards-table`
+**Refer to the `Makefile` for additional commands and details.**
 
 ## Tools/Libraries Used
 
@@ -148,8 +156,6 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 │   │   │   └── wallet.go             # Wallet routes
 │   │   └── server.go                  # HTTP server setup with gin
 │   ├── infra
-│   │   ├── docker
-│   │   │   └── init-db.sql               # Initial database setup script for docker compose
 │   │   ├── postgres
 │   │   │   ├── postgres_connection.go    # Postgres connection setup with pgx, returns *sql.DB
 │   │   │   └── postgres_migrations.go    # Database migration handling with golang-migrate/v4
@@ -178,9 +184,11 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 ├── main.go                           # Application entry point
 ├── Makefile                          # Development commands and shortcuts
 ├── Dockerfile                        # Docker file with multi stage builds
+├── Dockerfile.dev                    # Docker file for dev env, air live reload inside docker container.
 ├── .dockerignore                     # Directories to ignore in the Docker builds
 ├── README.md                         # Project documentation
 ├── compose.yaml                      # Docker Compose configuration
+├── compose.dev.yaml                  # Docker Compose configuration for dev env.
 ├── go.mod                            # Go module definition
 ├── go.sum                            # Go module checksums
 └── .air.toml                         # Live reload configuration with air

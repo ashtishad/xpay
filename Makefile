@@ -1,37 +1,11 @@
 DB_URL=postgres://ash:samplepass@localhost:5432/xpay?sslmode=disable
 
-# Application commands
-run:
-	@go run main.go
+# Docker Compose Commands for Development environment
+up:
+	@docker compose up --build
 
 watch:
-	@if ! command -v air > /dev/null; then \
-		go install github.com/cosmtrek/air@latest; \
-	fi
-	@air; \
-	rm -rf ./tmp
-
-test:
-	@go test -v -cover -short ./...
-
-lint:
-	@which golangci-lint > /dev/null 2>&1 || go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	@golangci-lint run ./...
-
-# Setup Git hooks
-setup-hooks:
-	@cp scripts/pre-push .git/hooks/
-	@chmod +x .git/hooks/pre-push
-	@echo "Git hooks set up successfully"
-
-swagger:
-	@which swag > /dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
-	@echo "Generating Swagger documentation..."
-	@swag init
-
-# Docker compose commands
-up:
-	@docker compose up -d
+	@docker compose -f compose.yaml -f compose.dev.yaml up --build
 
 down:
 	@docker compose down
@@ -39,7 +13,28 @@ down:
 down-data:
 	@docker compose down -v --remove-orphans
 
-# Database commands
+# Development Tools (Run locally)
+## Run tests
+test:
+	@go test -v -cover -short ./...
+
+## Run linter
+lint:
+	@which golangci-lint > /dev/null 2>&1 || go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	@golangci-lint run ./...
+
+## Generate Swagger documentation
+swagger:
+	@which swag > /dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
+	@swag init
+
+# Git Hooks
+setup-hooks:
+	@cp scripts/pre-push .git/hooks/
+	@chmod +x .git/hooks/pre-push
+	@echo "Git hooks set up successfully"
+
+# Database Migration Commands
 check_and_install_migrate:
 	@which migrate > /dev/null 2>&1 || go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
@@ -52,23 +47,5 @@ migrate-down: check_and_install_migrate
 migrate-create: check_and_install_migrate
 	@migrate create -ext sql -dir migrations -seq $(name)
 
-# Docker application commands
-docker-build:
-	@docker build -t xpay:latest .
-
-docker-run:
-	@docker run --name xpay_app --network xpay_network \
-		-e APP_ENV="dev" \
-		-e DB_URL="postgres://ash:samplepass@postgres:5432/xpay?sslmode=disable&timezone=UTC" \
-		-e SERVER_ADDRESS="0.0.0.0:8080" \
-		-e GIN_MODE="release" \
-		-p 8080:8080 xpay:latest
-
-docker-stop:
-	@docker stop xpay_app || true
-	@docker rm xpay_app || true
-
-docker-rerun: docker-stop docker-build docker-run
-
-.PHONY: run watch test lint up down down-data docker-build docker-run docker-stop docker-rerun \
-        migrate-up migrate-down migrate-create check_and_install_migrate setup-hooks swagger
+.PHONY: up watch down down-data test lint swagger setup-hooks \
+        migrate-up migrate-down migrate-create check_and_install_migrate
