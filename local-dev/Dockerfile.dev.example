@@ -1,0 +1,21 @@
+FROM golang:1.23.2-alpine3.20
+
+WORKDIR /app
+
+RUN apk add --no-cache git
+
+RUN go install github.com/air-verse/air@latest
+
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY . .
+
+RUN go build -o main .
+
+# Default up command
+CMD ["./main"]
+
+# Air command for live reloading (will be used in compose.dev.yaml)
+CMD ["air"]

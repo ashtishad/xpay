@@ -7,16 +7,32 @@ services:
       POSTGRES_USER: ash
       POSTGRES_PASSWORD: samplepass
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
-      - ./internal/infra/docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ash"]
+      test: ["CMD-SHELL", "pg_isready -U ash -d xpay"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
+    networks:
+      - xpay_network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: xpay_api
+    environment:
+      DB_URL: "postgres://ash:samplepass@postgres:5432/xpay?sslmode=disable&timezone=UTC"
+      SERVER_ADDRESS: "0.0.0.0:8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
     networks:
       - xpay_network
 

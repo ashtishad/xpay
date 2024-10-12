@@ -4,12 +4,11 @@ This guide explains the Makefile commands used in the XPay project, their purpos
 
 ## Table of Contents
 1. [Environment Variables](#environment-variables)
-2. [Application Commands](#application-commands)
-3. [Setup Git Hooks](#setup-git-hooks)
-4. [Generate Swagger Specifications](#generate-swagger-specifications)
-4. [Docker Compose Commands](#docker-compose-commands)
-5. [Database Commands](#database-commands)
-6. [Docker Application Commands](#docker-application-commands)
+2. [Standard Mode Commands](#standard-mode-commands)
+3. [Live Reload Mode Commands](#live-reload-mode-commands)
+4. [Development Tools](#development-tools)
+5. [Git Hooks](#git-hooks)
+6. [Database Migration Commands](#database-migration-commands)
 
 ## Environment Variables
 
@@ -19,28 +18,59 @@ DB_URL=postgres://ash:samplepass@localhost:5432/xpay?sslmode=disable
 
 This variable sets the database connection string for local development. It's used in database migration commands.
 
-## Application Commands
+## Standard Mode Commands
 
-### Run the Application
+### Start Application
 ```makefile
-run:
-	@go run main.go
+up:
+	@docker compose up --build
 ```
-**Purpose**: Starts the XPay application.
-**Usage**: `make run`
+**Purpose**: Starts all services defined in compose.yaml, building images if necessary.
+**Usage**: `make up`
 
-### Watch for Changes (Hot Reload)
+### Stop Application
+```makefile
+down:
+	@docker compose down
+```
+**Purpose**: Stops all running docker compose services.
+**Usage**: `make down`
+
+### Stop and Remove Data
+```makefile
+down-data:
+	@docker compose down -v --remove-orphans
+```
+**Purpose**: Stops services, removes containers, networks, volumes, and orphan containers.
+**Usage**: `make down-data`
+
+## Live Reload Mode Commands
+
+### Start Application with Live Reload
 ```makefile
 watch:
-	@if ! command -v air > /dev/null; then \
-		go install github.com/cosmtrek/air@latest; \
-	fi
-	@air; \
-	rm -rf ./tmp
+	@docker compose -f compose.yaml -f compose.dev.yaml up --build
 ```
-**Purpose**: Runs the application with hot reloading using `air`.
+**Purpose**: Starts the application with live reloading for development.
 **Usage**: `make watch`
-**Note**: Automatically installs `air` if not present and cleans up temporary files.
+
+### Stop Live Reload Application
+```makefile
+watch-down:
+	@docker compose -f compose.yaml -f compose.dev.yaml down
+```
+**Purpose**: Stops all running docker compose services in live reload mode.
+**Usage**: `make watch-down`
+
+### Stop and Remove Data (Live Reload Mode)
+```makefile
+watch-down-data:
+	@docker compose -f compose.yaml -f compose.dev.yaml down -v --remove-orphans
+```
+**Purpose**: Stops services, removes containers, networks, volumes, and orphan containers in live reload mode.
+**Usage**: `make watch-down-data`
+
+## Development Tools
 
 ### Run Tests
 ```makefile
@@ -60,7 +90,17 @@ lint:
 **Usage**: `make lint`
 **Note**: Automatically installs `golangci-lint` if not present.
 
-## Setup Git Hooks
+### Generate Swagger Documentation
+```makefile
+swagger:
+	@which swag > /dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
+	@swag init
+```
+**Purpose**: Generates Swagger documentation for the API.
+**Usage**: `make swagger`
+**Note**: Automatically installs the `swag` tool if not present.
+
+## Git Hooks
 
 ```makefile
 setup-hooks:
@@ -71,44 +111,7 @@ setup-hooks:
 **Purpose**: Sets up Git hooks, specifically the pre-push hook.
 **Usage**: `make setup-hooks`
 
-## Generate Swagger Specifications
-```makefile
-swagger:
-	@which swag > /dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
-	@echo "Generating Swagger documentation..."
-	@swag init
-```
-**Purpose**: Generates Swagger documentation for the API.
-**Usage**: `make swagger`
-**Note**: Automatically installs the `swag` tool if not present.
-
-## Docker Compose Commands
-
-### Start Docker Compose Services
-```makefile
-up:
-	@docker compose up -d
-```
-**Purpose**: Starts all services defined in docker-compose.yml in detached mode.
-**Usage**: `make up`
-
-### Stop Docker Compose Services
-```makefile
-down:
-	@docker compose down
-```
-**Purpose**: Stops all running docker-compose services.
-**Usage**: `make down`
-
-### Stop and Remove Docker Compose Services and Volumes
-```makefile
-down-data:
-	@docker compose down -v --remove-orphans
-```
-**Purpose**: Stops services, removes containers, networks, volumes, and orphan containers.
-**Usage**: `make down-data`
-
-## Database Commands
+## Database Migration Commands
 
 ### Check and Install Migrate Tool
 ```makefile
@@ -142,57 +145,18 @@ migrate-create: check_and_install_migrate
 **Purpose**: Creates a new migration file.
 **Usage**: `make migrate-create name=your_migration_name`
 
-## Docker Application Commands
-
-### Build Docker Image
-```makefile
-docker-build:
-	@docker build -t xpay:latest .
-```
-**Purpose**: Builds a Docker image for the XPay application.
-**Usage**: `make docker-build`
-
-### Run Docker Container
-```makefile
-docker-run:
-	@docker run --name xpay_app --network xpay_network \
-		-e APP_ENV="dev" \
-		-e DB_URL="postgres://ash:samplepass@postgres:5432/xpay?sslmode=disable&timezone=UTC" \
-		-e SERVER_ADDRESS="0.0.0.0:8080" \
-		-e GIN_MODE="release" \
-		-p 8080:8080 xpay:latest
-```
-**Purpose**: Runs the XPay application in a Docker container.
-**Usage**: `make docker-run`
-**Note**: Configures environment variables and network settings for the container.
-
-### Stop and Remove Docker Container
-```makefile
-docker-stop:
-	@docker stop xpay_app || true
-	@docker rm xpay_app || true
-```
-**Purpose**: Stops and removes the XPay Docker container.
-**Usage**: `make docker-stop`
-
-### Rebuild and Rerun Docker Container
-```makefile
-docker-rerun: docker-stop docker-build docker-run
-```
-**Purpose**: Stops the existing container, rebuilds the image, and runs a new container.
-**Usage**: `make docker-rerun`
-
 ## Best Practices
 
-1. Always use `make test` and `make lint` before committing changes.
-2. Use `make watch` during development for faster iteration.
-3. Run `make migrate-up` after pulling new changes to keep your database schema up-to-date.
-4. Use `make docker-rerun` when you need to rebuild and restart the application in Docker.
-5. Run `make setup-hooks` after cloning the repository to set up Git hooks.
+1. Use `make watch` during development for live reloading.
+2. Use `make up` for running the application in standard mode.
+3. Always run `make test` and `make lint` before committing changes.
+4. Run `make migrate-up` after pulling new changes to keep your database schema up-to-date.
+5. Use `make swagger` to update API documentation when endpoints change.
+6. Run `make setup-hooks` after cloning the repository to set up Git hooks.
 
 ## Troubleshooting
 
 - If you encounter permission issues with Docker commands, ensure your user is part of the Docker group.
 - For database connection issues, verify the `DB_URL` in the Makefile and ensure your PostgreSQL server is running.
-- If `air` or `golangci-lint` fail to install, check your Go installation and `GOPATH` settings.
+- If `golangci-lint` or `swag` fail to install, check your Go installation and `GOPATH` settings.
 - If Git hooks are not working, make sure you've run `make setup-hooks` and that the scripts have execute permissions.
