@@ -18,11 +18,8 @@ tmp/
 # misc
 .DS_Store
 config.yaml
-config.local.yaml
 config.staging.yaml
 config.production.yaml
 .env
-.env.local
-.env.staging.local
-.env.production.local
+app.env
 xPay.postman_collection.json
