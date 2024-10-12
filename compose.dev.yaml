@@ -6,8 +6,6 @@ services:
     volumes:
       - .:/app
     command: air
-    environment:
-      GIN_MODE: debug
 
 volumes:
   pg_data:

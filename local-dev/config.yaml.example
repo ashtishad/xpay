@@ -1,7 +1,7 @@
 app:
   env: dev  # Options: dev, staging, production
   gin_mode: release # Options: debug, release.
-  server_address: ":8080"
+  server_address: "0.0.0.0:8080"
 
 db:
   # Use environment variables for credentials in non-local environments
