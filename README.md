@@ -44,13 +44,7 @@
   </a>
 </p>
 
-- [Gin](https://github.com/gin-gonic/gin)
-- [pgx](https://github.com/jackc/pgx)
-- [golang-migrate](https://github.com/golang-migrate/migrate)
-- [golang-jwt](https://github.com/golang-jwt/jwt/)
-- [viper](https://github.com/spf13/viper)
-- [swaggo/swag](https://github.com/swaggo/swag)
-- [golangci-lint](https://golangci-lint.run/)
+**Core Libraries:** [Gin](https://github.com/gin-gonic/gin), [pgx](https://github.com/jackc/pgx),  [golang-migrate](https://github.com/golang-migrate/migrate), [golang-jwt](https://github.com/golang-jwt/jwt/), [viper](https://github.com/spf13/viper), [swaggo/swag](https://github.com/swaggo/swag), and [golangci-lint](https://golangci-lint.run/)
 
 ## Progress
 
