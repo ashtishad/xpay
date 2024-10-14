@@ -47,7 +47,7 @@ func GetJSONHandlerOptions(logLevel *slog.LevelVar) *slog.HandlerOptions {
 
 		return slog.Attr{
 			Key: slog.SourceKey,
-			Value: slog.AnyValue(map[string]interface{}{
+			Value: slog.AnyValue(map[string]any{
 				"function": extractFuncName(source.Function),
 				"file":     filepath.Base(source.File),
 				"line":     source.Line,

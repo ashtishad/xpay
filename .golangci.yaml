@@ -1,0 +1,47 @@
+run:
+  timeout: 3m
+  tests: false
+
+linters:
+  disable-all: true
+  enable:
+    # bugs/error
+    - staticcheck
+    - gosec
+    - errcheck
+
+    # performance
+    - prealloc
+
+    # style, formatting
+    - gofmt
+    - goconst
+    - unconvert
+    - misspell
+    - unparam
+    - nakedret
+    - tagliatelle
+#    - dupl
+
+linters-settings:
+  gofmt:
+    rewrite-rules:
+      - pattern: 'interface{}'
+        replacement: 'any'
+      - pattern: 'a[b:len(a)]'
+        replacement: 'a[b:]'
+
+  misspell:
+    locale: US
+
+  errcheck:
+    check-type-assertions: true
+  dupl:
+    threshold: 150
+
+issues:
+  max-same-issues: 0
+  max-issues-per-linter: 0
+  exclude-use-default: false
+  exclude:
+    - G104

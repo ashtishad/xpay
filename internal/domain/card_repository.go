@@ -195,7 +195,12 @@ func (r *cardRepository) List(ctx context.Context, filters CardFilters) ([]*Card
 		return nil, common.NewInternalServerError(common.ErrUnexpectedDatabase, err)
 	}
 
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		clsErr := rows.Close()
+		if clsErr != nil {
+			slog.WarnContext(ctx, "failed to close rows", "err", clsErr)
+		}
+	}(rows)
 
 	var cards []*Card
 	for rows.Next() {
