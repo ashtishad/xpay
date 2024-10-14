@@ -40,10 +40,6 @@ func New(policy *Policy) *RBAC {
 // HasPermission checks if a role has permission for a given path and method
 // Used in the Auth Middleware
 func (r *RBAC) HasPermission(role, path, method string) bool {
-	if role == "admin" {
-		return true
-	}
-
 	routeName := getRouteName(r, path, method)
 	if routeName == "" {
 		return false
@@ -63,24 +59,35 @@ func (r *RBAC) HasPermission(role, path, method string) bool {
 }
 
 // getRouteName resolves the route name from a path and method
+// Tailored for policy.json and gin's c.FullPath()
 func getRouteName(rbac *RBAC, path, method string) string {
-	parts := strings.Split(path, "/")
-	for i := len(parts); i > 0; i-- {
-		template := strings.Join(parts[:i], "/")
-		for _, routes := range rbac.routes {
-			if routeActions, ok := routes[template]; ok {
-				if routeName, ok := routeActions[method]; ok {
-					return routeName
+	for _, routes := range rbac.routes {
+		for routeTemplate, actions := range routes {
+			if matchRoute(path, routeTemplate) {
+				if _, ok := actions[method]; ok {
+					return actions[method]
 				}
 			}
 		}
+	}
+	return ""
+}
 
-		if i > 0 {
-			parts[i-1] = ":param"
+func matchRoute(path, template string) bool {
+	pathParts := strings.Split(path, "/")
+	templateParts := strings.Split(template, "/")
+
+	if len(pathParts) != len(templateParts) {
+		return false
+	}
+
+	for i, part := range templateParts {
+		if part != pathParts[i] && !strings.HasPrefix(part, ":") {
+			return false
 		}
 	}
 
-	return ""
+	return true
 }
 
 // CanCreateUser checks if a given role can create a user with a specific role
