@@ -1,5 +1,16 @@
 #!/bin/sh
 
+echo "Running go fmt..."
+# Run go fmt and capture its output
+fmt_output=$(go fmt ./...)
+
+# Check if there was any output (indicating changes were made)
+if [ -n "$fmt_output" ]; then
+    echo "go fmt made changes. Please commit these changes before pushing:"
+    echo "$fmt_output"
+    exit 1
+fi
+
 echo "Running tests..."
 make test
 if [ $? -ne 0 ]; then
