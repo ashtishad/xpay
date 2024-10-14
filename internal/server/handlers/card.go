@@ -136,7 +136,7 @@ func (h *CardHandler) GetCard(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.CardResponse(dto.NewCardResponse(card)))
+	c.JSON(http.StatusOK, dto.NewCardResponse(card))
 }
 
 // UpdateCard godoc

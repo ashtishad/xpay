@@ -7,6 +7,6 @@ import (
 )
 
 func registerUserManagementRoutes(rg *gin.RouterGroup, userRepo domain.UserRepository) {
-    userHandler := handlers.NewUserHandler(userRepo)
-    rg.POST("", userHandler.CreateUserWithRole)
+	userHandler := handlers.NewUserHandler(userRepo)
+	rg.POST("", userHandler.CreateUserWithRole)
 }
