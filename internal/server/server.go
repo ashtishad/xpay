@@ -12,6 +12,7 @@ import (
 	"github.com/ashtishad/xpay/internal/common"
 	"github.com/ashtishad/xpay/internal/infra/postgres"
 	"github.com/ashtishad/xpay/internal/secure"
+	"github.com/ashtishad/xpay/internal/secure/rbac"
 	"github.com/ashtishad/xpay/internal/server/middlewares"
 	"github.com/ashtishad/xpay/internal/server/routes"
 	"github.com/gin-gonic/gin"
@@ -54,6 +55,13 @@ func NewServer(ctx context.Context) (*Server, error) {
 		return nil, fmt.Errorf("failed to create card encryptor: %w", err)
 	}
 
+	policy, err := rbac.LoadPolicy()
+	if err != nil {
+		return nil, fmt.Errorf("failed to load rbac policy: %w", err)
+	}
+
+	rbac := rbac.New(policy)
+
 	s := &Server{
 		Router: router,
 		DB:     db,
@@ -68,7 +76,7 @@ func NewServer(ctx context.Context) (*Server, error) {
 	}
 
 	s.setupMiddlewares()
-	s.setupRoutes(jwtManager, cardEncryptor)
+	s.setupRoutes(jwtManager, cardEncryptor, rbac)
 
 	setSwaggerInfo(s.httpServer.Addr)
 
@@ -126,11 +134,11 @@ func (s *Server) setupMiddlewares() {
 }
 
 // setupRoutes initializes all API routes for the server.
-func (s *Server) setupRoutes(jm *secure.JWTManager, cardEncryptor *secure.CardEncryptor) {
+func (s *Server) setupRoutes(jm *secure.JWTManager, cardEncryptor *secure.CardEncryptor, rbac *rbac.RBAC) {
 	s.Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	apiGroup := s.Router.Group("/api/v1")
-	routes.InitRoutes(apiGroup, s.DB, s.Config, jm, cardEncryptor)
+	routes.InitRoutes(apiGroup, s.DB, s.Config, jm, cardEncryptor, rbac)
 }
 
 // Start begins listening for HTTP requests on the configured address.

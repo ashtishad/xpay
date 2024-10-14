@@ -9,6 +9,7 @@ import (
 	"github.com/ashtishad/xpay/internal/domain"
 	"github.com/ashtishad/xpay/internal/dto"
 	"github.com/ashtishad/xpay/internal/secure"
+	"github.com/ashtishad/xpay/internal/secure/rbac"
 	"github.com/gin-gonic/gin"
 )
 
@@ -59,7 +60,7 @@ func (h *UserHandler) CreateUserWithRole(c *gin.Context) {
 		return
 	}
 
-	if !secure.CanCreateUser(user.Role, req.Role) {
+	if !rbac.CanCreateUser(user.Role, req.Role) {
 		c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "You don't have permission to create a user with this role"})
 		return
 	}

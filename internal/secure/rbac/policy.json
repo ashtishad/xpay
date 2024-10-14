@@ -1,0 +1,131 @@
+{
+  "routes": {
+    "users": {
+      "/api/v1/users": {
+        "POST": "CreateUserWithRole"
+      }
+    },
+    "wallets": {
+      "/api/v1/users/:user_uuid/wallets": {
+        "POST": "CreateWallet"
+      },
+      "/api/v1/users/:user_uuid/wallets/:wallet_uuid/balance": {
+        "GET": "GetWalletBalance"
+      },
+      "/api/v1/users/:user_uuid/wallets/:wallet_uuid/status": {
+        "PATCH": "UpdateWalletStatus"
+      }
+    },
+    "cards": {
+      "/api/v1/users/:user_uuid/wallets/:wallet_uuid/cards": {
+        "POST": "AddCardToWallet",
+        "GET": "ListCards"
+      },
+      "/api/v1/users/:user_uuid/wallets/:wallet_uuid/cards/:card_uuid": {
+        "GET": "GetCard",
+        "PATCH": "UpdateCard",
+        "DELETE": "DeleteCard"
+      }
+    }
+  },
+  "roles": {
+    "admin": {
+      "CreateUserWithRole": [
+        "POST"
+      ],
+      "CreateWallet": [
+        "POST"
+      ],
+      "GetWalletBalance": [
+        "GET"
+      ],
+      "UpdateWalletStatus": [
+        "PATCH"
+      ],
+      "AddCardToWallet": [
+        "POST"
+      ],
+      "GetCard": [
+        "GET"
+      ],
+      "UpdateCard": [
+        "PATCH"
+      ],
+      "DeleteCard": [
+        "DELETE"
+      ],
+      "ListCards": [
+        "GET"
+      ]
+    },
+    "user": {
+      "CreateWallet": [
+        "POST"
+      ],
+      "GetWalletBalance": [
+        "GET"
+      ],
+      "UpdateWalletStatus": [
+        "PATCH"
+      ],
+      "AddCardToWallet": [
+        "POST"
+      ],
+      "GetCard": [
+        "GET"
+      ],
+      "UpdateCard": [
+        "PATCH"
+      ],
+      "DeleteCard": [
+        "DELETE"
+      ],
+      "ListCards": [
+        "GET"
+      ]
+    },
+    "agent": {
+      "CreateUserWithRole": [
+        "POST"
+      ],
+      "GetWalletBalance": [
+        "GET"
+      ],
+      "UpdateWalletStatus": [
+        "PATCH"
+      ],
+      "GetCard": [
+        "GET"
+      ],
+      "ListCards": [
+        "GET"
+      ]
+    },
+    "merchant": {
+      "CreateWallet": [
+        "POST"
+      ],
+      "GetWalletBalance": [
+        "GET"
+      ],
+      "UpdateWalletStatus": [
+        "PATCH"
+      ],
+      "AddCardToWallet": [
+        "POST"
+      ],
+      "GetCard": [
+        "GET"
+      ],
+      "UpdateCard": [
+        "PATCH"
+      ],
+      "DeleteCard": [
+        "DELETE"
+      ],
+      "ListCards": [
+        "GET"
+      ]
+    }
+  }
+}

@@ -44,7 +44,7 @@
   </a>
 </p>
 
-**Core Libraries:** [Gin](https://github.com/gin-gonic/gin), [pgx](https://github.com/jackc/pgx),  [golang-migrate](https://github.com/golang-migrate/migrate), [golang-jwt](https://github.com/golang-jwt/jwt/), [viper](https://github.com/spf13/viper), [swaggo/swag](https://github.com/swaggo/swag), and [golangci-lint](https://golangci-lint.run/)
+**Core Libraries:** [Gin](https://github.com/gin-gonic/gin), [pgx](https://github.com/jackc/pgx),  [golang-migrate](https://github.com/golang-migrate/migrate), [golang-jwt](https://github.com/golang-jwt/jwt/), [viper](https://github.com/spf13/viper), [swaggo/swag](https://github.com/swaggo/swag), [golangci-lint](https://golangci-lint.run/), and [testify](https://github.com/stretchr/testify).
 
 ## Progress
 
@@ -55,7 +55,7 @@
 | API Design & Architecture | • Domain Driven Design, Clean Architecure <br>• RESTful API<br>• Event streaming with Apache Kafka<br>• OpenAPI 2.0 specifications | ✅<br>✅<br>🔄<br>✅ |
 | Security | • JWT-ES256 with ECDSA asymmetric key pairs<br>• AES-256-GCM for card data encryption<br>• SQL injection prevention with parameterized sql queries<br>• Role based access control (RBAC) <br>• DTO for controlled data to the client<br>• User input and query param validation<br>• IP-Based Rate limiting with Token Bucket algorithm | ✅<br>✅<br>✅<br>✅<br>✅<br>✅<br>✅ |
 | Database | • ACID transactions with appropriate isolation levels<br>• Raw SQL for performance<br>• Connection pooling with pgx, exposing standard *sql.DB<br>• Optimized indexing and unique constraints<br>• Version-controlled schema changes with migrations | ✅<br>✅<br>✅<br>✅<br>✅ |
-| Core Operations & Observability | • Custom AppError interface for error handling<br>• Centralized configuration management with Viper<br>• Structured logging with slog<br>• Context with timeout for each request <br>• Comprehensive test coverage<br>• Code quality with golangci-lint | ✅<br>✅<br>✅<br>✅<br>🔄<br>✅ |
+| Core Operations & Observability | • Custom AppError interface for error handling<br>• Centralized configuration management with Viper<br>• Structured logging with slog<br>• Context with timeout for each request <br>• Comprehensive test coverage<br>• Code quality with golangci-lint | ✅<br>✅<br>✅<br>✅<br>✅<br>✅ |
 | Payment Gateways | • Idempotent payment processing<br>• Stripe integration<br>• PayPal integration<br>• Webhook handling for asynchronous events | 🔄<br>🔄<br>🔄<br>🔄 |
 | Deployment & Monitoring | • Multi-stage Docker builds for minimal image size <br>• GitHub Actions CI pipeline<br>• AWS RDS with PostgreSQL<br>• ECS Fargate for serverless container deployment<br>• Prometheus metrics and Grafana dashboards | ✅<br>✅<br>🔄<br>🔄<br>🔄 |
 
@@ -112,39 +112,43 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 │   │   ├── user_repository.go        # User repository interface, database interactions
 │   │   ├── wallet.go                 # Wallet domain model
 │   │   └── wallet_repository.go      # Wallet repository interface, database interactions
-│   ├── dto
-│   │   ├── auth.go                   # Authentication-related DTOs/REST API Request Response Structurers
-│   │   ├── card.go                   # Card-related DTOs
-│   │   ├── shared.go                 # Shared DTO structures
-│   │   └── user.go                   # User-related DTOs
-│   │   └── wallet.go                 # Wallet-related DTOs
 │   ├── secure
 │   │   ├── card_aes.go               # Card AES-256 with GCM mode, Validate, Encrypt and Decrypt
 │   │   ├── jwt.go                    # JWT token handling, generate and validate tokens
-│   │   ├── rbac.go                   # Role based access control (RBAC) policies
 │   │   ├── password.go               # Password hashing and verification with bcrypt
 │   │   └── password_test.go          # Password utility tests
+│   │   ├── rbac
+│   │   │   ├── policy.json          # RBAC policies for the API
+│   │   │   ├── policy.go            # Loading policy from policy.json
+│   │   │   ├── rbac.go              # Core logic of RBAC
+│   │   │   └── rbac_test.go         # Unit tests
 │   ├── server
 │   │   ├── handlers
 │   │   │   ├── auth.go               # Login, Register handlers
 │   │   │   ├── card.go               # Card http handlers
 │   │   │   ├── helpers.go            # Handlers helper functions
-│   │   │   └── user.go               # User HTTP handlers
+│   │   │   ├── user.go               # User HTTP handlers
 │   │   │   └── wallet.go             # Wallet HTTP handlers
 │   │   ├── middlewares
 │   │   │   ├── auth.go               # Auth middleware (Validate token, Set Authorized user in req context)
 │   │   │   ├── cors.go               # CORS middleware
 │   │   │   ├── gin_logger.go         # Custom Logging middleware for gin
 │   │   │   ├── middlewares.go        # Core Middleware setup
-│   │   │   └── rate_limiter.go       # IP-Based rate limiter with token bucket algorithm
+│   │   │   ├── rate_limiter.go       # IP-Based rate limiter with token bucket algorithm
 │   │   │   └── request_id.go         # Request ID middleware, sets X-Request-ID header
 │   │   ├── routes
 │   │   │   ├── auth.go               # Authentication routes
 │   │   │   ├── card.go               # Card routes
 │   │   │   ├── routes.go             # Core routes setup
-│   │   │   └── user.go               # User  routes
+│   │   │   ├── user.go               # User  routes
 │   │   │   └── wallet.go             # Wallet routes
 │   │   └── server.go                  # HTTP server setup with gin
+│   ├── dto
+│   │   ├── auth.go                    # Authentication-related DTOs/REST API Request Response Structurers
+│   │   ├── card.go                    # Card-related DTOs
+│   │   ├── shared.go                  # Shared DTO structures
+│   │   ├── user.go                    # User-related DTOs
+│   │   └── wallet.go                  # Wallet-related DTOs
 │   ├── infra
 │   │   ├── postgres
 │   │   │   ├── postgres_connection.go    # Postgres connection setup with pgx, returns *sql.DB
@@ -158,7 +162,7 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 │   │   ├── context_keys.go           # Context key definitions
 │   │   ├── custom_err_messages.go    # Error message definitions
 │   │   ├── slog_config.go            # Structured logging configuration
-│   │   ├── timeouts.go               # Context timeout constants
+│   │   └── timeouts.go               # Context timeout constants
 ├── migrations
 │   ├── 000001_create_users_table.down.sql   # User table rollback
 │   ├── 000001_create_users_table.up.sql     # User table creation
