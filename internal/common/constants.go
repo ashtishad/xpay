@@ -8,6 +8,9 @@ const (
 	RequestIDHeader = "X-Request-ID"
 	RequestIDKey    = "requestID"
 
+	AuthorizationHeaderKey = "Authorization"
+	TokenTypeBearer        = "bearer"
+
 	DBTSLayout       = "time.RFC3339"
 	CardExpiryLayout = "01/06" // MM/YY
 

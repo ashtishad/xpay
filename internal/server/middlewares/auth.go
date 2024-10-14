@@ -10,14 +10,15 @@ import (
 	"github.com/ashtishad/xpay/internal/domain"
 	"github.com/ashtishad/xpay/internal/dto"
 	"github.com/ashtishad/xpay/internal/secure"
+	"github.com/ashtishad/xpay/internal/secure/rbac"
 	"github.com/gin-gonic/gin"
 )
 
 // AuthMiddleware validates JWT tokens, authenticates users, enforces RBAC policies,
 // and sets the authenticated user in the request context for subsequent handlers.
-func AuthMiddleware(userRepo domain.UserRepository, jwtPublicKey *ecdsa.PublicKey) gin.HandlerFunc {
+func AuthMiddleware(userRepo domain.UserRepository, jwtPublicKey *ecdsa.PublicKey, rbac *rbac.RBAC) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
+		authHeader := c.GetHeader(common.AuthorizationHeaderKey)
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{Error: "Missing authorization header"})
 			c.Abort()
@@ -25,7 +26,7 @@ func AuthMiddleware(userRepo domain.UserRepository, jwtPublicKey *ecdsa.PublicKe
 		}
 
 		bearerToken := strings.Split(authHeader, " ")
-		if len(bearerToken) != 2 || strings.ToLower(bearerToken[0]) != "bearer" {
+		if len(bearerToken) != 2 || strings.ToLower(bearerToken[0]) != common.TokenTypeBearer {
 			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{Error: "Invalid authorization header format"})
 			c.Abort()
 			return
@@ -48,8 +49,8 @@ func AuthMiddleware(userRepo domain.UserRepository, jwtPublicKey *ecdsa.PublicKe
 			return
 		}
 
-		if !secure.CheckRBAC(c.FullPath(), c.Request.Method, user.Role) {
-			slog.Warn("access denied", "role", user.Role, "req", c.Request.Method, "path", c.FullPath())
+		if !rbac.HasPermission(user.Role, c.FullPath(), c.Request.Method) {
+			slog.Warn("access denied", "role", user.Role, "method", c.Request.Method, "path", c.FullPath())
 			c.JSON(http.StatusForbidden, dto.ErrorResponse{Error: "Access denied"})
 			c.Abort()
 			return
