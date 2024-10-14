@@ -12,28 +12,44 @@
 
 ## Quick Start
 
-1. Clone and set up configuration:
-   ```
-   git clone git@github.com:ashtishad/xpay.git && cd xpay
-   cp local-dev/config.yaml.example config.yaml
-   ```
+This project supports two environments: Production and Development. Docker Desktop is required to run the application.
 
-2. Run and manage the application:
-   ```
-   make up            # Start the application
-   make down          # Stop the application
-   make down-data     # Stop and remove data
-   ```
+Clone the repository:
+```bash
+git clone git@github.com:ashtishad/xpay.git && cd xpay
+```
 
-3. Development commands (run locally):
-   ```
-   make test          # Run tests
-   make lint          # Run linter
-   make swagger       # Generate Swagger docs
-   make migrate-create name=your_migration_name  # Create a migration
-   ```
+### Production
+For users who want to run the project and interact with the API (no code changes):
+```bash
+make setup-prod-env  # Set up the environment
+make up              # Run the application
 
-**For more details on available commands, refer to the `Makefile`**
+### More Commands
+make down            # Stop the application
+make down-data       # Stop and remove postgres data
+```
+
+### Development
+For developers who intend to modify the code and contribute to the project:
+```bash
+make setup-dev-env   # Set up the environment
+make up              # Required for starting the postgres docker service
+make watch           # Run with live reload
+
+### More Commands
+make run             # Run normally
+make down            # Stop the application
+make down-data       # Stop and remove postgres data
+make test            # Run tests
+make lint            # Run linter
+make swagger         # Generate Swagger docs
+make migrate-create name=your_migration_name  # Create a new migration
+```
+
+> **Note:** `setup-prod-env` and `setup-dev-env` copy appropriate configurations and set up necessary tools for each environment.
+
+> **For all available commands, see the `Makefile` in the project root.**
 
 
 ## Tech Stack
@@ -170,10 +186,16 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 │   └── 000002_create_wallets_table.up.sql   # Wallet table creation
 │   ├── 000003_create_cards_table.down.sql   # Cards table rollback
 │   └── 000003_create_cards_table.up.sql     # Cards table creation
-├── scripts
-│   └── pre-push                      # Git pre-push hook (ensures run tests and lint before every push)
-├── local-dev
-│   └── config.yaml.example           # Example configuration file (place it to project root as `config.yaml`)
+├── scripts/
+│   ├── pre-push                      # Git pre-push hook (runs tests and lint before every push)
+│   ├── setup-dev-env.sh              # Script to set up development environment
+│   └── setup-prod-env.sh             # Script to set up production environment
+├── env-configs/
+│   ├── Makefile.dev                  # Makefile for development environment
+│   ├── Makefile.prod                 # Makefile for production environment
+│   ├── compose.yaml.dev              # Docker Compose file for development
+│   ├── compose.yaml.prod             # Docker Compose file for production
+│   └── config.yaml.example           # Example configuration file
 ├── config.yaml                       # Application configuration
 ├── main.go                           # Application entry point
 ├── Makefile                          # Development commands and shortcuts

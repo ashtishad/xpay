@@ -13,7 +13,7 @@ exclude_dir = [
     "vendor",
     "testdata",
     "scripts",
-    "local-dev",
+    "env-configs",
     "docs",
     "docs/wiki",
 ]
