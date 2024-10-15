@@ -12,28 +12,57 @@
 
 ## Quick Start
 
-1. Clone and set up configuration:
+This project supports two environments: Production and Development. Docker Desktop is required to run the application.
+
+1. Clone the repository:
    ```
    git clone git@github.com:ashtishad/xpay.git && cd xpay
-   cp local-dev/config.yaml.example config.yaml
    ```
 
-2. Run and manage the application:
+### Production Environment
+For users who want to run the project and interacting with the API (no code changes):
+
+2. Set up and run:
    ```
-   make up            # Start the application
+   make setup-prod-env
+   make up
+   ```
+
+3. Management commands:
+   ```
    make down          # Stop the application
-   make down-data     # Stop and remove data
+   make down-data     # Stop and remove postgres data
    ```
 
-3. Development commands (run locally):
+### Development Environment
+For developers who intend to modify the code and contribute to the project:
+
+2. Set up the environment:
    ```
+   make setup-dev-env
+   ```
+
+3. Run the application:
+   ```
+   make up            # Required for starting the postgres docker service
+   make watch         # Run with live reload
+   # OR
+   make run           # Run normally
+   ```
+
+4. Development tools:
+   ```
+   make down          # Stop the application
+   make down-data     # Stop and remove postgres data
    make test          # Run tests
    make lint          # Run linter
    make swagger       # Generate Swagger docs
-   make migrate-create name=your_migration_name  # Create a migration
+   make migrate-create name=your_migration_name  # Create a new migration
    ```
 
-**For more details on available commands, refer to the `Makefile`**
+**Note:** `setup-prod-env` and `setup-dev-env` copy appropriate configurations and set up necessary tools for each environment.
+
+**For all available commands, see the `Makefile` in the project root.**
 
 
 ## Tech Stack
@@ -170,10 +199,16 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 │   └── 000002_create_wallets_table.up.sql   # Wallet table creation
 │   ├── 000003_create_cards_table.down.sql   # Cards table rollback
 │   └── 000003_create_cards_table.up.sql     # Cards table creation
-├── scripts
-│   └── pre-push                      # Git pre-push hook (ensures run tests and lint before every push)
-├── local-dev
-│   └── config.yaml.example           # Example configuration file (place it to project root as `config.yaml`)
+├── scripts/
+│   ├── pre-push                      # Git pre-push hook (runs tests and lint before every push)
+│   ├── setup-dev-env.sh              # Script to set up development environment
+│   └── setup-prod-env.sh             # Script to set up production environment
+├── env-configs/
+│   ├── Makefile.dev                  # Makefile for development environment
+│   ├── Makefile.prod                 # Makefile for production environment
+│   ├── compose.yaml.dev              # Docker Compose file for development
+│   ├── compose.yaml.prod             # Docker Compose file for production
+│   └── config.yaml.example           # Example configuration file
 ├── config.yaml                       # Application configuration
 ├── main.go                           # Application entry point
 ├── Makefile                          # Development commands and shortcuts
