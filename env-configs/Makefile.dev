@@ -42,14 +42,17 @@ down:
 down-data:
 	@docker compose down -v --remove-orphans
 
-# Database commands
-migrate-up:
+# Database Migration Commands
+check_and_install_migrate:
+	@which migrate > /dev/null 2>&1 || go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+migrate-up: check_and_install_migrate
 	@migrate -path migrations -database "$(DB_URL)" -verbose up
 
-migrate-down:
+migrate-down: check_and_install_migrate
 	@migrate -path migrations -database "$(DB_URL)" -verbose down
 
-migrate-create:
+migrate-create: check_and_install_migrate
 	@migrate create -ext sql -dir migrations -seq $(name)
 
 # Docker application commands
@@ -71,4 +74,4 @@ docker-stop:
 docker-rerun: docker-stop docker-build docker-run
 
 .PHONY: run watch test lint up down down-data docker-build docker-run docker-stop docker-rerun \
-        migrate-up migrate-down migrate-create
+        migrate-up migrate-down migrate-create check_and_install_migrate
