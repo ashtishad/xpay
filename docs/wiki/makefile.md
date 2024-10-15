@@ -1,134 +1,131 @@
 # Makefile Guide
 
-This guide explains the Makefile commands used in the XPay project, their purposes, and how to use them.
+This guide explains how to use the Makefile commands in the XPay project for both production and development environments.
 
-## Table of Contents
-1. [Environment Variables](#environment-variables)
-2. [Docker Compose Commands](#docker-compose-commands)
-3. [Development Tools](#development-tools)
-4. [Git Hooks](#git-hooks)
-5. [Database Migration Commands](#database-migration-commands)
+## Prerequisites
+
+- Docker Desktop installed and running
+- Git installed
+
+## Production Environment
+
+Use this setup if you want to run the project and interact with the API without making code changes.
+
+### Setup and Run
+
+1. Clone the repository:
+   ```
+   git clone git@github.com:ashtishad/xpay.git && cd xpay
+   ```
+
+2. Set up the production environment:
+   ```
+   make setup-prod-env
+   ```
+
+3. Start the application:
+   ```
+   make up
+   ```
+
+### Management Commands
+
+- Stop the application:
+  ```
+  make down
+  ```
+
+- Stop and remove all data:
+  ```
+  make down-data
+  ```
+
+- Run tests:
+  ```
+  make test
+  ```
+
+## Development Environment
+
+Use this setup if you intend to modify the code and contribute to the project.
+
+### Setup and Run
+
+1. Clone the repository (if not done already):
+   ```
+   git clone git@github.com:ashtishad/xpay.git && cd xpay
+   ```
+
+2. Set up the development environment:
+   ```
+   make setup-dev-env
+   ```
+
+3. Start the database:
+   ```
+   make up
+   ```
+
+4. Run the application (choose one):
+   - With live reload:
+     ```
+     make watch
+     ```
+   - Without live reload:
+     ```
+     make run
+     ```
+
+### Development Commands
+
+- Run tests:
+  ```
+  make test
+  ```
+
+- Run linter:
+  ```
+  make lint
+  ```
+
+- Generate Swagger documentation:
+  ```
+  make swagger
+  ```
+
+- Create a new database migration:
+  ```
+  make migrate-create name=your_migration_name
+  ```
+
+- Apply database migrations:
+  ```
+  make migrate-up
+  ```
+
+- Revert last database migration:
+  ```
+  make migrate-down
+  ```
 
 ## Environment Variables
 
-```makefile
-DB_URL=postgres://user:password@host:port/dbname?sslmode=disable&timezone=UTC
-```
+The `DB_URL` environment variable is used for database connections. It's defined in your `config.yaml` file or set in the Docker Compose configuration.
 
-This variable sets the database connection string for local development. It's used in database migration commands.
+- Local development:
+  ```
+  DB_URL=postgres://ash:samplepass@localhost:5432/xpay?sslmode=disable&timezone=UTC
+  ```
 
-## Docker Compose Commands
-
-### Start Application
-```makefile
-up:
-	@docker compose up
-```
-**Purpose**: Starts all services defined in compose.yaml.
-**Usage**: `make up`
-
-### Stop Application
-```makefile
-down:
-	@docker compose down
-```
-**Purpose**: Stops all running docker compose services.
-**Usage**: `make down`
-
-### Stop and Remove Data
-```makefile
-down-data:
-	@docker compose down -v --remove-orphans
-```
-**Purpose**: Stops services, removes containers, networks, volumes, and orphan containers.
-**Usage**: `make down-data`
-
-## Development Tools
-
-### Run Tests
-```makefile
-test:
-	@go test -v -cover -short ./...
-```
-**Purpose**: Runs all tests with verbose output, coverage, and in short mode.
-**Usage**: `make test`
-
-### Lint Code
-```makefile
-lint:
-	@which golangci-lint > /dev/null 2>&1 || go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	@golangci-lint run ./...
-```
-**Purpose**: Runs the golangci-lint tool for code quality checks.
-**Usage**: `make lint`
-**Note**: Automatically installs `golangci-lint` if not present.
-
-### Generate Swagger Documentation
-```makefile
-swagger:
-	@which swag > /dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
-	@swag init
-```
-**Purpose**: Generates Swagger documentation for the API.
-**Usage**: `make swagger`
-**Note**: Automatically installs the `swag` tool if not present.
-
-## Git Hooks
-
-```makefile
-setup-hooks:
-	@cp scripts/pre-push .git/hooks/
-	@chmod +x .git/hooks/pre-push
-	@echo "Git hooks set up successfully"
-```
-**Purpose**: Sets up Git hooks, specifically the pre-push hook.
-**Usage**: `make setup-hooks`
-
-## Database Migration Commands
-
-### Check and Install Migrate Tool
-```makefile
-check_and_install_migrate:
-	@which migrate > /dev/null 2>&1 || go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-```
-**Purpose**: Ensures the `migrate` tool is installed.
-**Usage**: This is a helper command used by other migration commands.
-
-### Run Migrations Up
-```makefile
-migrate-up: check_and_install_migrate
-	@migrate -path migrations -database "$(DB_URL)" -verbose up
-```
-**Purpose**: Applies all pending database migrations.
-**Usage**: `make migrate-up`
-
-### Revert Migrations
-```makefile
-migrate-down: check_and_install_migrate
-	@migrate -path migrations -database "$(DB_URL)" -verbose down
-```
-**Purpose**: Reverts the last applied database migration.
-**Usage**: `make migrate-down`
-
-### Create New Migration
-```makefile
-migrate-create: check_and_install_migrate
-	@migrate create -ext sql -dir migrations -seq $(name)
-```
-**Purpose**: Creates a new migration file.
-**Usage**: `make migrate-create name=your_migration_name`
-
-## Best Practices
-
-1. Use `make up` to start the application and its dependencies.
-2. Always run `make test` and `make lint` before committing changes.
-3. Run `make migrate-up` after pulling new changes to keep your database schema up-to-date.
-4. Use `make swagger` to update API documentation when endpoints change.
-5. Run `make setup-hooks` after cloning the repository to set up Git hooks.
+- Docker environment:
+  ```
+  DB_URL=postgres://ash:samplepass@postgres:5432/xpay?sslmode=disable&timezone=UTC
+  ```
 
 ## Troubleshooting
 
-- If you encounter permission issues with Docker commands, ensure your user is part of the Docker group.
-- For database connection issues, verify the `DB_URL` in the Makefile and ensure your PostgreSQL server is running.
-- If `golangci-lint` or `swag` fail to install, check your Go installation and `GOPATH` settings.
-- If Git hooks are not working, make sure you've run `make setup-hooks` and that the scripts have execute permissions.
+- For database issues, check the `DB_URL` in your `config.yaml` or environment variables.
+- Ensure Docker is running for Docker-related commands.
+- For development tool issues, verify your Go installation and `GOPATH` settings.
+
+For more detailed information on each command, refer to the comments in the Makefile.
