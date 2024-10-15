@@ -2,11 +2,11 @@
 
 PROJECT_ROOT=$(git rev-parse --show-toplevel)
 
-cp "$PROJECT_ROOT/local-dev/Makefile.dev" "$PROJECT_ROOT/Makefile"
-cp "$PROJECT_ROOT/local-dev/compose.yaml.dev" "$PROJECT_ROOT/compose.yaml"
+cp "$PROJECT_ROOT/env-configs/Makefile.dev" "$PROJECT_ROOT/Makefile"
+cp "$PROJECT_ROOT/env-configs/compose.yaml.dev" "$PROJECT_ROOT/compose.yaml"
 
 if [ ! -f "$PROJECT_ROOT/config.yaml" ]; then
-    cp "$PROJECT_ROOT/local-dev/config.yaml.example" "$PROJECT_ROOT/config.yaml"
+    cp "$PROJECT_ROOT/env-configs/config.yaml.example" "$PROJECT_ROOT/config.yaml"
 fi
 
 # Function to install a Go package if it's not already installed
