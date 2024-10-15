@@ -16,8 +16,8 @@ tmp/
 .idea
 
 # Environmnt Config related files (Comment out if you made any changes to these files)
-Makefile
 compose.yaml
+Makefile
 config.yaml
 
 # misc
