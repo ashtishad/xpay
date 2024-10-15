@@ -21,5 +21,10 @@ setup-dev-env:
 test:
 	@go test -v -cover -short ./...
 
+lint:
+	@which golangci-lint > /dev/null 2>&1 || go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	@golangci-lint run ./...
+
+
 # Declare PHONY targets
-.PHONY: up down down-data setup-prod-env setup-dev-env test
+.PHONY: up down down-data setup-prod-env setup-dev-env test lint
