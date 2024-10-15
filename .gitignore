@@ -15,9 +15,13 @@ tmp/
 .vscode
 .idea
 
+# Environmnt Config related files (Comment out if you made any changes to these files)
+Makefile
+compose.yaml
+config.yaml
+
 # misc
 .DS_Store
-config.yaml
 config.staging.yaml
 config.production.yaml
 .env
