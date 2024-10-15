@@ -12,28 +12,55 @@
 
 ## Quick Start
 
-1. Clone and set up configuration:
+This project supports two environments: Production and Development.
+
+### Production Environment
+For users who want to run the project and interact with the API without making code changes:
+
+1. Clone the repository:
    ```
    git clone git@github.com:ashtishad/xpay.git && cd xpay
-   cp local-dev/config.yaml.example config.yaml
    ```
 
-2. Run and manage the application:
+2. Set up the production environment:
+   ```
+   make setup-prod-env
+   ```
+
+3. Run and manage the application:
    ```
    make up            # Start the application
    make down          # Stop the application
    make down-data     # Stop and remove data
    ```
 
-3. Development commands (run locally):
+### Development Environment
+For developers who intend to modify the code and contribute to the project:
+
+1. Clone the repository:
    ```
+   git clone git@github.com:ashtishad/xpay.git && cd xpay
+   ```
+
+2. Set up the development environment:
+   ```
+   make setup-dev-env
+   ```
+
+3. Development commands:
+   ```
+   make watch         # Run the application with hot-reloading
    make test          # Run tests
    make lint          # Run linter
    make swagger       # Generate Swagger docs
-   make migrate-create name=your_migration_name  # Create a migration
+   make migrate-up    # Run database migrations
+   make migrate-down  # Revert database migrations
+   make migrate-create name=your_migration_name  # Create a new migration
    ```
 
-**For more details on available commands, refer to the `Makefile`**
+**Note:** The `setup-prod-env` and `setup-dev-env` commands will copy the appropriate Makefile and Docker Compose configurations, and set up the necessary tools for each environment.
+
+**For more details on available commands, refer to the `Makefile` in the project root.**
 
 
 ## Tech Stack
