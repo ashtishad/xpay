@@ -21,6 +21,7 @@ on:
 env:
   GO_VERSION: '1.23.2'
   GOLANGCI_LINT_VERSION: v1.61
+  DB_URL: postgres://ash:samplepass@localhost:5432/xpay?sslmode=disable
 
 jobs:
 
@@ -54,11 +55,16 @@ jobs:
     - name: Update Go modules
       run: go mod tidy
 
+    - name: Install golang-migrate
+      run: |
+        go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+        which migrate
+
     - name: Run migrations
-      run: make migrate-up
+      run: migrate -path migrations -database "${{ env.DB_URL }}" -verbose up
 
     - name: Run Tests
-      run: make test
+      run: go test -race ./...
 
     - name: Golangci-lint
       uses: golangci/golangci-lint-action@v6

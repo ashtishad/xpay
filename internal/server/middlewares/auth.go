@@ -8,9 +8,9 @@ import (
 
 	"github.com/ashtishad/xpay/internal/common"
 	"github.com/ashtishad/xpay/internal/domain"
-	"github.com/ashtishad/xpay/internal/dto"
 	"github.com/ashtishad/xpay/internal/secure"
 	"github.com/ashtishad/xpay/internal/secure/rbac"
+	"github.com/ashtishad/xpay/internal/server/dto"
 	"github.com/gin-gonic/gin"
 )
 

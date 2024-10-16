@@ -7,13 +7,12 @@ services:
       POSTGRES_USER: ash
       POSTGRES_PASSWORD: samplepass
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
-      - ./internal/infra/docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ash"]
+      test: ["CMD-SHELL", "pg_isready -U ash -d xpay"]
       interval: 10s
       timeout: 5s
       retries: 3

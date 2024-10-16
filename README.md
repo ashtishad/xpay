@@ -7,7 +7,6 @@
 - [Progress](#progress)
 - [Architecture and Request Flow](#architecture-and-request-flow)
 - [Directory Structure](#directory-structure)
-- [Wiki](#wiki)
 - [API Documentation](#api-documentation)
 
 ## Quick Start
@@ -50,6 +49,8 @@ make migrate-create name=your_migration_name  # Create a new migration
 > **Note:** `setup-prod-env` and `setup-dev-env` copy appropriate configurations and set up necessary tools for each environment.
 
 > **For all available commands, see the `Makefile` in the project root.**
+
+> **For detailed guide on various aspects of the project, refer to the [wiki](https://github.com/ashtishad/xpay/wiki)**
 
 
 ## Tech Stack
@@ -103,15 +104,12 @@ wallet.go (model) -> wallet_repository.go -> wallet_handlers.go (using DTOs)
 1. Domain Models: `internal/domain/*.go`
 2. Repositories: `internal/domain/*_repository.go`
 3. HTTP Handlers: `internal/server/handlers/*.go`
-4. DTOs: `internal/dto/*.go`
+4. DTOs: `internal/server/dto/*.go`
 5. Routes: `internal/server/routes/*.go`
 
 <a href="#top">Back to Top</a>
 
 ## Directory Structure
-
-<details>
-<summary>Click to expand Directory Structure</summary>
 
 command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 
@@ -158,13 +156,13 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 │   │   │   ├── routes.go             # Core routes setup
 │   │   │   ├── user.go               # User  routes
 │   │   │   └── wallet.go             # Wallet routes
-│   │   └── server.go                  # HTTP server setup with gin
-│   ├── dto
-│   │   ├── auth.go                    # Authentication-related DTOs/REST API Request Response Structurers
-│   │   ├── card.go                    # Card-related DTOs
-│   │   ├── shared.go                  # Shared DTO structures
-│   │   ├── user.go                    # User-related DTOs
-│   │   └── wallet.go                  # Wallet-related DTOs
+│   │   ├── dto
+│   │   │   ├── auth.go               # Authentication-related DTOs/REST API Request Response Structurers
+│   │   │   ├── card.go               # Card dto
+│   │   │   ├── shared.go             # Shared dto
+│   │   │   ├── user.go               # User  dto
+│   │   │   └── wallet.go             # Wallet routes
+│   │   └── server.go                 # HTTP server setup with gin
 │   ├── infra
 │   │   ├── postgres
 │   │   │   ├── postgres_connection.go    # Postgres connection setup with pgx, returns *sql.DB
@@ -191,11 +189,11 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 │   ├── setup-dev-env.sh              # Script to set up development environment
 │   └── setup-prod-env.sh             # Script to set up production environment
 ├── env-configs/
-│   ├── Makefile.dev                  # Makefile for development environment
-│   ├── Makefile.prod                 # Makefile for production environment
-│   ├── compose.yaml.dev              # Docker Compose file for development
-│   ├── compose.yaml.prod             # Docker Compose file for production
-│   └── config.yaml.example           # Example configuration file
+│   ├── dev.Makefile                  # Makefile for development environment
+│   ├── prod.Makefile                 # Makefile for production environment
+│   ├── compose.dev.yaml              # Docker Compose file for development
+│   ├── compose.prod.yaml             # Docker Compose file for production
+│   └── config.example.yaml           # Example configuration file
 ├── config.yaml                       # Application configuration
 ├── main.go                           # Application entry point
 ├── Makefile                          # Development commands and shortcuts
@@ -208,32 +206,9 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 └── .air.toml                         # Live reload configuration with air
 ```
 
-</details>
-
 <a href="#top">Back to Top</a>
 
-## Wiki
-
-For detailed information on various aspects of the project, refer to the following guides:
-
-<details>
-<summary>Click to expand Wiki</summary>
-
-- [Makefile Commands](https://github.com/ashtishad/xpay/blob/main/docs/wiki/makefile.md): Comprehensive guide to all Make commands used in development and deployment.
-- [Configuration Management](https://github.com/ashtishad/xpay/blob/main/docs/wiki/config.md): Learn how to manage application configuration using Viper.
-- [Dockerfile Guide](https://github.com/ashtishad/xpay/blob/main/docs/wiki/dockerfile.md): Instructions for building and running the XPay application in Docker.
-- [Generating Secrets](https://github.com/ashtishad/xpay/blob/main/docs/wiki/generating_secrets.md): Procedures for generating and managing cryptographic keys and secrets.
-- [GitHub Actions Test Workflow](https://github.com/ashtishad/xpay/blob/main/docs/wiki/github_actions_test_workflow.md): Understanding the CI/CD pipeline setup using GitHub Actions.
-- [Linter Configuration](https://github.com/ashtishad/xpay/blob/main/docs/wiki/linter_config.md): Explanation of golangci-lint setup and usage in the project.
-- [Configuration and Key Management in Production](https://github.com/ashtishad/xpay/blob/main/docs/wiki/configuration_key_management_in_production.md): Best practices for managing configs and secrets in production environments.
-- [Zed/VSCode Shortcuts](https://github.com/ashtishad/xpay/blob/main/docs/wiki/zed_vscode_shortcuts.md): Helpful keyboard shortcuts for efficient coding in Zed or VSCode editors.
-
-</details>
-
 ## API Documentation
-
-<details>
-<summary>Click to expand API Documentation</summary>
 
 ### Authentication Endpoints
 
@@ -387,7 +362,5 @@ For detailed information on various aspects of the project, refer to the followi
   - `status` (optional): Filter by card status
 - **Success Response**: `200 OK`
 - **Error Responses**: `401 Unauthorized`, `403 Forbidden`, `500 Internal Server Error`
-
-</details>
 
 [Back to Top](#top)
