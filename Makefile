@@ -25,13 +25,5 @@ lint:
 	@which golangci-lint > /dev/null 2>&1 || go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	@golangci-lint run ./...
 
-# Database Migration Commands
-check_and_install_migrate:
-	@which migrate > /dev/null 2>&1 || go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-
-migrate-up: check_and_install_migrate
-	@migrate -path migrations -database "$(DB_URL)" -verbose up
-
-
 # Declare PHONY targets
-.PHONY: up down down-data setup-prod-env setup-dev-env test lint check_and_install_migrate migrate-up
+.PHONY: up down down-data setup-prod-env setup-dev-env test lint
