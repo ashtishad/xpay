@@ -103,7 +103,7 @@ wallet.go (model) -> wallet_repository.go -> wallet_handlers.go (using DTOs)
 1. Domain Models: `internal/domain/*.go`
 2. Repositories: `internal/domain/*_repository.go`
 3. HTTP Handlers: `internal/server/handlers/*.go`
-4. DTOs: `internal/dto/*.go`
+4. DTOs: `internal/server/dto/*.go`
 5. Routes: `internal/server/routes/*.go`
 
 <a href="#top">Back to Top</a>
@@ -158,13 +158,13 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 │   │   │   ├── routes.go             # Core routes setup
 │   │   │   ├── user.go               # User  routes
 │   │   │   └── wallet.go             # Wallet routes
-│   │   └── server.go                  # HTTP server setup with gin
-│   ├── dto
-│   │   ├── auth.go                    # Authentication-related DTOs/REST API Request Response Structurers
-│   │   ├── card.go                    # Card-related DTOs
-│   │   ├── shared.go                  # Shared DTO structures
-│   │   ├── user.go                    # User-related DTOs
-│   │   └── wallet.go                  # Wallet-related DTOs
+│   │   ├── dto
+│   │   │   ├── auth.go               # Authentication-related DTOs/REST API Request Response Structurers
+│   │   │   ├── card.go               # Card dto
+│   │   │   ├── shared.go             # Shared dto
+│   │   │   ├── user.go               # User  dto
+│   │   │   └── wallet.go             # Wallet routes
+│   │   └── server.go                 # HTTP server setup with gin
 │   ├── infra
 │   │   ├── postgres
 │   │   │   ├── postgres_connection.go    # Postgres connection setup with pgx, returns *sql.DB
