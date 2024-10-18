@@ -7,7 +7,6 @@
 - [Progress](#progress)
 - [Architecture and Request Flow](#architecture-and-request-flow)
 - [Directory Structure](#directory-structure)
-- [Wiki](#wiki)
 - [API Documentation](#api-documentation)
 
 ## Quick Start
@@ -48,8 +47,8 @@ make migrate-create name=your_migration_name  # Create a new migration
 ```
 
 > **Note:** `setup-prod-env` and `setup-dev-env` copy appropriate configurations and set up necessary tools for each environment.
-
 > **For all available commands, see the `Makefile` in the project root.**
+> **For detailed guide on various aspects of the project, refer to the [wiki](https://github.com/ashtishad/xpay/wiki)**
 
 
 ## Tech Stack
@@ -109,9 +108,6 @@ wallet.go (model) -> wallet_repository.go -> wallet_handlers.go (using DTOs)
 <a href="#top">Back to Top</a>
 
 ## Directory Structure
-
-<details>
-<summary>Click to expand Directory Structure</summary>
 
 command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 
@@ -208,32 +204,9 @@ command: `tree -a -I '.git|.DS_Store|.gitignore|.idea|.vscode|docs'`
 └── .air.toml                         # Live reload configuration with air
 ```
 
-</details>
-
 <a href="#top">Back to Top</a>
 
-## Wiki
-
-For detailed information on various aspects of the project, refer to the following guides:
-
-<details>
-<summary>Click to expand Wiki</summary>
-
-- [Makefile Commands](https://github.com/ashtishad/xpay/blob/main/docs/wiki/makefile.md): Comprehensive guide to all Make commands used in development and deployment.
-- [Configuration Management](https://github.com/ashtishad/xpay/blob/main/docs/wiki/config.md): Learn how to manage application configuration using Viper.
-- [Dockerfile Guide](https://github.com/ashtishad/xpay/blob/main/docs/wiki/dockerfile.md): Instructions for building and running the XPay application in Docker.
-- [Generating Secrets](https://github.com/ashtishad/xpay/blob/main/docs/wiki/generating_secrets.md): Procedures for generating and managing cryptographic keys and secrets.
-- [GitHub Actions Test Workflow](https://github.com/ashtishad/xpay/blob/main/docs/wiki/github_actions_test_workflow.md): Understanding the CI/CD pipeline setup using GitHub Actions.
-- [Linter Configuration](https://github.com/ashtishad/xpay/blob/main/docs/wiki/linter_config.md): Explanation of golangci-lint setup and usage in the project.
-- [Configuration and Key Management in Production](https://github.com/ashtishad/xpay/blob/main/docs/wiki/configuration_key_management_in_production.md): Best practices for managing configs and secrets in production environments.
-- [Zed/VSCode Shortcuts](https://github.com/ashtishad/xpay/blob/main/docs/wiki/zed_vscode_shortcuts.md): Helpful keyboard shortcuts for efficient coding in Zed or VSCode editors.
-
-</details>
-
 ## API Documentation
-
-<details>
-<summary>Click to expand API Documentation</summary>
 
 ### Authentication Endpoints
 
@@ -387,7 +360,5 @@ For detailed information on various aspects of the project, refer to the followi
   - `status` (optional): Filter by card status
 - **Success Response**: `200 OK`
 - **Error Responses**: `401 Unauthorized`, `403 Forbidden`, `500 Internal Server Error`
-
-</details>
 
 [Back to Top](#top)
