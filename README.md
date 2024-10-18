@@ -47,7 +47,9 @@ make migrate-create name=your_migration_name  # Create a new migration
 ```
 
 > **Note:** `setup-prod-env` and `setup-dev-env` copy appropriate configurations and set up necessary tools for each environment.
+
 > **For all available commands, see the `Makefile` in the project root.**
+
 > **For detailed guide on various aspects of the project, refer to the [wiki](https://github.com/ashtishad/xpay/wiki)**
 
 
