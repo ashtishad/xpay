@@ -1,3 +1,5 @@
+GOPATH := $(shell go env GOPATH)
+GOLANGCI_LINT := $(GOPATH)/bin/golangci-lint
 DB_URL=postgres://ash:samplepass@localhost:5432/xpay?sslmode=disable
 
 # Application commands
@@ -5,30 +7,22 @@ run:
 	@go run main.go
 
 watch:
-	@if ! command -v air > /dev/null; then \
-		go install github.com/cosmtrek/air@latest; \
-	fi
-	@air; \
-	rm -rf ./tmp
+	@air
 
 test:
 	@go test -v -cover -short ./...
 
 lint:
-	@which golangci-lint > /dev/null 2>&1 || go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	@golangci-lint run ./...
+	@$(GOLANGCI_LINT) run ./...
 
 swagger:
-	@which swag > /dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
 	@swag init
 
 # Setup Environments
 setup-prod-env:
-	chmod +x scripts/setup-prod-env.sh
 	@./scripts/setup-prod-env.sh
 
 setup-dev-env:
-	chmod +x scripts/setup-dev-env.sh
 	@./scripts/setup-dev-env.sh
 
 # Docker compose commands
@@ -42,16 +36,13 @@ down-data:
 	@docker compose down -v --remove-orphans
 
 # Database Migration Commands
-check_and_install_migrate:
-	@which migrate > /dev/null 2>&1 || go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-
-migrate-up: check_and_install_migrate
+migrate-up:
 	@migrate -path migrations -database "$(DB_URL)" -verbose up
 
-migrate-down: check_and_install_migrate
+migrate-down:
 	@migrate -path migrations -database "$(DB_URL)" -verbose down
 
-migrate-create: check_and_install_migrate
+migrate-create:
 	@migrate create -ext sql -dir migrations -seq $(name)
 
 # Docker application commands
@@ -72,5 +63,6 @@ docker-stop:
 
 docker-rerun: docker-stop docker-build docker-run
 
-.PHONY: run watch test lint up down down-data docker-build docker-run docker-stop docker-rerun \
-        migrate-up migrate-down migrate-create check_and_install_migrate
+.PHONY: run watch test lint swagger up down down-data \
+        migrate-up migrate-down migrate-create \
+        docker-build docker-run docker-stop docker-rerun setup-prod-env setup-dev-env

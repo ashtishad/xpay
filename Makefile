@@ -1,3 +1,6 @@
+GOPATH := $(shell go env GOPATH)
+GOLANGCI_LINT := $(GOPATH)/bin/golangci-lint
+
 # Application commands with Docker Compose
 up:
 	@docker compose up
@@ -10,11 +13,9 @@ down-data:
 
 # Setup Environments
 setup-prod-env:
-	chmod +x scripts/setup-prod-env.sh
 	@./scripts/setup-prod-env.sh
 
 setup-dev-env:
-	chmod +x scripts/setup-dev-env.sh
 	@./scripts/setup-dev-env.sh
 
 # Development Tools
@@ -22,8 +23,6 @@ test:
 	@go test -v -cover -short ./...
 
 lint:
-	@which golangci-lint > /dev/null 2>&1 || go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	@golangci-lint run ./...
+	@$(GOLANGCI_LINT) run ./...
 
-# Declare PHONY targets
 .PHONY: up down down-data setup-prod-env setup-dev-env test lint
