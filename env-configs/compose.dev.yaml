@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:17.0-alpine3.20
+    image: postgres:17.4-alpine3.21
     container_name: xpay_postgres
     environment:
       POSTGRES_DB: xpay
