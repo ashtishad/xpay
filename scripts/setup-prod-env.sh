@@ -9,6 +9,12 @@ if [ ! -f "$PROJECT_ROOT/config.example.yaml" ]; then
     cp "$PROJECT_ROOT/env-configs/config.example.yaml" "$PROJECT_ROOT/config.example.yaml"
 fi
 
+# Add GOPATH/bin to PATH if not already present
+GOPATH=$(go env GOPATH)
+if [[ ":$PATH:" != *":$GOPATH/bin:"* ]]; then
+    export PATH="$PATH:$GOPATH/bin"
+fi
+
 # Setup Git Hooks
 setup_git_hooks() {
     mkdir -p "$PROJECT_ROOT/.git/hooks"
