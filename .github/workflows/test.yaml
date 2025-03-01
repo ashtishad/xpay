@@ -19,8 +19,8 @@ on:
       - '.github/workflows/**.yaml'
 
 env:
-  GO_VERSION: '1.23.2'
-  GOLANGCI_LINT_VERSION: v1.61
+  GO_VERSION: '1.24'
+  GOLANGCI_LINT_VERSION: v1.64
   DB_URL: postgres://ash:samplepass@localhost:5432/xpay?sslmode=disable
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17.0-alpine3.20
+        image: postgres:17.4-alpine3.21
         env:
           POSTGRES_DB: xpay
           POSTGRES_USER: ash
