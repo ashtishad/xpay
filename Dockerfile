@@ -1,27 +1,18 @@
 # Build stage
-FROM golang:1.23.2-alpine3.20 AS builder
-
-WORKDIR /build
-
-COPY go.mod go.sum ./
-RUN go mod download && go mod verify
-
+FROM golang:1.24.0-alpine3.21 AS builder
+WORKDIR /app
 COPY . .
-
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main main.go
 
 # Final stage
-FROM alpine:3.20
+FROM alpine:3.21
+WORKDIR /app
 
-RUN adduser -D ash
-USER ash
-WORKDIR /home/ash
-
-COPY --chown=ash:ash --from=builder /build .
-COPY --chown=ash:ash --from=builder /build/migrations ./migrations
-COPY --chown=ash:ash --from=builder /build/config.yaml .
+COPY --from=builder /app .
+COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/config.yaml .
 
 EXPOSE 8080
 
-ENTRYPOINT ["/home/ash/main"]
+ENTRYPOINT ["/app/main"]
 CMD []
